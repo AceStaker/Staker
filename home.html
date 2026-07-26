@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ace Staker | Home</title>
+
+<!-- Google Font: Rajdhani (headers/stats) + Inter (body) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<!-- Font Awesome for icons (spade, sports icons, chevrons) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<!-- Neon ambient background — Home page only, see styles.css -->
+<div class="home-glow-bg"></div>
+
+<!-- Confetti overlay canvas — used for level-ups and big parlay wins -->
+<canvas id="confettiCanvas"></canvas>
+
+<!-- =========================================================
+     HEADER
+     ========================================================= -->
+<header class="header">
+  <a href="home.html" class="logo" style="text-decoration:none;">
+    <i class="fa-solid fa-spade"></i>
+    <span>Ace Staker</span>
+  </a>
+
+  <nav>
+    <ul class="nav-links">
+      <li><a href="casino.html" data-nav="casino">Casino</a></li>
+      <li><a href="sports.html" data-nav="sports">Sports</a></li>
+      <li><a href="live.html" data-nav="live">Live</a></li>
+      <li><a href="esports.html" data-nav="esports">Esports</a></li>
+      <li><a href="promotions.html" data-nav="promotions">Promotions</a></li>
+      <li><a href="help.html" data-nav="help">Help</a></li>
+    </ul>
+  </nav>
+
+  <div class="header-right">
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">
+      <i class="fa-solid fa-moon" id="themeIcon"></i>
+    </button>
+
+    <!-- Rank pill — click opens the Profile modal on the Achievements tab -->
+    <div class="rank-pill glass" id="rankPill" title="View rank & achievements">
+      <i class="fa-solid fa-crown"></i><span class="rank-text" id="rankPillText">Gold</span>
+    </div>
+
+    <div class="balance-pill" id="balancePill">
+      <i class="fa-solid fa-coins"></i>
+      <span class="balance-text" id="balanceText">₹12,450.00</span>
+    </div>
+
+    <div class="avatar-wrap">
+      <div class="avatar" id="avatarBtn">TS<span class="avatar-level" id="avatarLevel">12</span></div>
+      <div class="dropdown glass" id="userDropdown">
+        <a href="#" id="profileBtn"><i class="fa-solid fa-user"></i> My Profile</a>
+        <a href="#" id="historyBtn"><i class="fa-solid fa-clock-rotate-left"></i> Betting History</a>
+        <a href="#" id="leaderboardBtn"><i class="fa-solid fa-ranking-star"></i> Leaderboard</a>
+        <a href="#"><i class="fa-solid fa-wallet"></i> Deposit / Withdraw</a>
+        <hr>
+        <a href="#"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="#"><i class="fa-solid fa-user-plus"></i> Register</a>
+        <hr>
+        <button><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</button>
+      </div>
+    </div>
+
+    <button class="mobile-nav-toggle"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<!-- =========================================================
+     LIVE SCORE / BIG WIN TICKER — content duplicated once so the
+     translateX(-50%) keyframe loops seamlessly. Big wins are
+     spliced in by JS to keep the marquee feeling alive.
+     ========================================================= -->
+<div class="ticker-wrap">
+  <div class="ticker" id="tickerTrack"><!-- populated by JS --></div>
+</div>
+
+<!-- =========================================================
+     MAIN APP LAYOUT — Home has no bet slip, so "no-betslip" gives
+     the main content the full width.
+     ========================================================= -->
+<div class="app-layout no-betslip">
+
+  <main class="main-content">
+
+    <!-- =========================================================
+         LIVE SCOREBOARD — betting-app style strip of live/upcoming
+         match scores across all sports, scroll to see more, click
+         a card to jump into that sport's odds.
+         ========================================================= -->
+    <section class="live-scoreboard">
+      <div class="scoreboard-header">
+        <h2 class="section-title" style="margin:0;"><i class="fa-solid fa-tower-broadcast"></i> Live Scoreboard</h2>
+        <a href="live.html" class="scoreboard-viewall">View All <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+      <div class="scoreboard-scroll" id="homeScoreboard"><!-- populated by JS --></div>
+    </section>
+
+    <!-- HERO -->
+    <section class="hero">
+      <div class="hero-content">
+        <span class="hero-tag">LIMITED TIME</span>
+        <h1>100% Casino &amp; Sports Match up to <span>₹1,00,000</span></h1>
+        <p>Join Ace Staker today and double your first deposit. Live-dealer tables, slots, and sportsbook odds — bet like the best, zero fuss.</p>
+        <button class="btn-hero" onclick="window.location.href='promotions.html'">Claim Bonus <i class="fa-solid fa-arrow-right"></i></button>
+        <button class="btn-hero" style="background:linear-gradient(120deg,var(--purple),#c9a4ff); box-shadow:0 0 18px rgba(155,93,229,.4); margin-left:10px;" onclick="window.location.href='casino.html'">Enter Casino <i class="fa-solid fa-dice"></i></button>
+      </div>
+    </section>
+
+    <!-- PLATFORM STATS -->
+    <div class="home-stats-grid">
+      <div class="stat-box"><div class="val">500+</div><div class="lbl">Casino Games</div></div>
+      <div class="stat-box"><div class="val">12.4K+</div><div class="lbl">Live Bettors Today</div></div>
+      <div class="stat-box"><div class="val">₹2.4Cr+</div><div class="lbl">Paid Out This Month</div></div>
+      <div class="stat-box"><div class="val">24/7</div><div class="lbl">Support &amp; Payouts</div></div>
+    </div>
+
+    <!-- WHY CHOOSE US -->
+    <h2 class="section-title"><i class="fa-solid fa-star"></i> Why Choose Ace Staker</h2>
+    <div class="feature-strip-grid">
+      <div class="feature-strip-card glass">
+        <i class="fa-solid fa-bolt"></i>
+        <h5>Instant Payouts</h5>
+        <p>Most withdrawals to e-wallets land within minutes.</p>
+      </div>
+      <div class="feature-strip-card glass">
+        <i class="fa-solid fa-chart-line"></i>
+        <h5>Live Odds Engine</h5>
+        <p>Prices move in real time as every match unfolds.</p>
+      </div>
+      <div class="feature-strip-card glass">
+        <i class="fa-solid fa-shield-halved"></i>
+        <h5>Secure &amp; Licensed</h5>
+        <p>Regulated play with responsible gambling tools built in.</p>
+      </div>
+      <div class="feature-strip-card glass">
+        <i class="fa-solid fa-headset"></i>
+        <h5>24/7 Support</h5>
+        <p>Real humans on chat, day or night, whenever you need them.</p>
+      </div>
+    </div>
+
+    <!-- HOW IT WORKS -->
+    <h2 class="section-title"><i class="fa-solid fa-list-ol"></i> How It Works</h2>
+    <div class="how-it-works-grid">
+      <div class="how-step glass">
+        <div class="how-step-num">1</div>
+        <h5>Sign Up in Seconds</h5>
+        <p>Create your account — no paperwork, just an email and a password.</p>
+      </div>
+      <div class="how-step glass">
+        <div class="how-step-num">2</div>
+        <h5>Claim Your Bonus</h5>
+        <p>Deposit and get a 100% match up to ₹1,00,000 on casino and sports.</p>
+      </div>
+      <div class="how-step glass">
+        <div class="how-step-num">3</div>
+        <h5>Bet &amp; Win</h5>
+        <p>Jump into live tables or live odds and start climbing the leaderboard.</p>
+      </div>
+    </div>
+
+    <!-- QUICK ACCESS -->
+    <h2 class="section-title"><i class="fa-solid fa-compass"></i> Explore Ace Staker</h2>
+    <div class="quicklink-grid">
+      <a href="casino.html" class="quicklink-card glass">
+        <i class="fa-solid fa-dice quicklink-icon"></i>
+        <h4>Casino</h4>
+        <p>500+ slots plus live roulette, blackjack, and baccarat tables.</p>
+        <span class="quicklink-cta">Enter Casino <i class="fa-solid fa-arrow-right"></i></span>
+      </a>
+      <a href="sports.html" class="quicklink-card glass">
+        <i class="fa-solid fa-futbol quicklink-icon"></i>
+        <h4>Sports</h4>
+        <p>Football, basketball, tennis, and more with live-moving odds.</p>
+        <span class="quicklink-cta">View Matches <i class="fa-solid fa-arrow-right"></i></span>
+      </a>
+      <a href="live.html" class="quicklink-card glass">
+        <i class="fa-solid fa-tower-broadcast quicklink-icon"></i>
+        <h4>Live Betting</h4>
+        <p>Bet in real time on matches that are happening right now.</p>
+        <span class="quicklink-cta">Go Live <i class="fa-solid fa-arrow-right"></i></span>
+      </a>
+      <a href="esports.html" class="quicklink-card glass">
+        <i class="fa-solid fa-gamepad quicklink-icon"></i>
+        <h4>Esports</h4>
+        <p>CS:GO, League of Legends, and Valorant markets, updated live.</p>
+        <span class="quicklink-cta">Explore <i class="fa-solid fa-arrow-right"></i></span>
+      </a>
+    </div>
+
+    <!-- LEADERBOARD -->
+    <h2 class="section-title" id="leaderboardSection"><i class="fa-solid fa-ranking-star"></i> Top Stakers This Week</h2>
+    <div class="leaderboard glass" id="leaderboardList" style="padding:8px;"><!-- populated by JS --></div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <div class="footer-brand">
+        <div class="logo"><i class="fa-solid fa-spade"></i><span>Ace Staker</span></div>
+        <p>Bet Like the Best. Premium odds, real-time markets, and a rewards engine built for serious bettors.</p>
+        <div class="footer-badges">
+          <span>18+ Only</span>
+          <span>Licensed &amp; Regulated</span>
+          <span>Play Responsibly</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Sports</h5>
+        <a href="sports.html">Football</a>
+        <a href="sports.html">Basketball</a>
+        <a href="esports.html">Esports</a>
+        <a href="sports.html">Tennis</a>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <a href="#">About Us</a>
+        <a href="#">Careers</a>
+        <a href="#">Affiliates</a>
+        <a href="#">Press</a>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <a href="help.html">Help Center</a>
+        <a href="help.html">Responsible Gambling</a>
+        <a href="help.html">Contact Us</a>
+        <a href="help.html">Terms &amp; Privacy</a>
+      </div>
+    </footer>
+    <div class="footer-bottom">© 2026 Ace Staker. For entertainment simulation only — no real money is wagered on this demo.</div>
+
+  </main>
+</div>
+
+<!-- =========================================================
+     PROFILE / HISTORY / ACHIEVEMENTS MODAL
+     ========================================================= -->
+<div class="modal-overlay" id="historyModal">
+  <div class="modal glass">
+    <div class="modal-header">
+      <h2><i class="fa-solid fa-user-tie"></i> My Profile</h2>
+      <button class="modal-close" id="closeModal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat-box"><div class="val" id="modalBalance">₹12,450.00</div><div class="lbl">Current Balance</div></div>
+      <div class="stat-box"><div class="val" id="modalWins">14</div><div class="lbl">Wins</div></div>
+      <div class="stat-box"><div class="val" id="modalLosses">8</div><div class="lbl">Losses</div></div>
+    </div>
+
+    <div class="wl-bar-wrap">
+      <div class="wl-label"><span>Win / Loss Ratio</span><span id="wlPercent">64%</span></div>
+      <div class="wl-bar"><div class="wl-bar-fill" id="wlBarFill" style="width:64%;"></div></div>
+    </div>
+
+    <h3 style="font-family:var(--font-display); margin-bottom:10px; font-size:1.05rem;">Achievements</h3>
+    <div class="achv-grid" id="achvGrid"><!-- populated by JS --></div>
+
+    <h3 style="font-family:var(--font-display); margin-bottom:10px; font-size:1.05rem;">Betting History</h3>
+    <table class="history">
+      <thead>
+        <tr><th>Date</th><th>Event</th><th>Stake</th><th>Result</th><th>P/L</th></tr>
+      </thead>
+      <tbody id="historyTableBody"><!-- populated by JS --></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Toast notification (bet placed / win / loss) -->
+<div class="toast" id="toast"><i class="fa-solid fa-check-circle"></i> <span id="toastMsg">Bet placed successfully!</span></div>
+
+<!-- Achievement unlock toast -->
+<div class="achieve-toast" id="achieveToast">
+  <i class="fa-solid fa-trophy trophy"></i>
+  <div>
+    <div class="a-title">Achievement Unlocked</div>
+    <div class="a-name" id="achieveName">First Blood</div>
+    <div class="a-desc" id="achieveDesc">Place your first bet</div>
+  </div>
+</div>
+
+<!-- Big win social-proof feed -->
+<div class="winfeed-stack" id="winfeedStack"></div>
+
+<script src="script.js"></script>
+</body>
+</html>
