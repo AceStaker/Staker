@@ -1,0 +1,102 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ace Staker | Operations</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="feature-styles.css">
+</head>
+<body class="operations-page">
+  <div class="operations-bg"></div>
+
+  <header class="header operations-header">
+    <a href="home.html" class="logo" aria-label="Ace Staker home">
+      <i class="fa-solid fa-spade"></i>
+      <span>Ace Staker</span>
+    </a>
+
+    <div class="operations-title">
+      <span>ADMIN CONSOLE</span>
+      <strong>Operations</strong>
+    </div>
+
+    <div class="header-right">
+      <a class="operations-site-link" href="home.html">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i>
+        <span>View website</span>
+      </a>
+      <div class="balance-pill" id="balancePill">
+        <i class="fa-solid fa-coins"></i>
+        <span class="balance-text" id="balanceText">â‚¹0.00</span>
+      </div>
+      <div class="avatar-wrap">
+        <div class="avatar" id="avatarBtn">GU<span class="avatar-level" id="avatarLevel">A</span></div>
+        <div class="dropdown glass" id="userDropdown">
+          <a href="#"><i class="fa-solid fa-wallet"></i> Deposit / Withdraw</a>
+          <a href="#"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+          <a href="#"><i class="fa-solid fa-user-plus"></i> Register</a>
+          <hr>
+          <button><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="operations-main">
+    <div class="operations-heading">
+      <div>
+        <span class="operations-kicker">CONTROL CENTER</span>
+        <h1>Operations Dashboard</h1>
+        <p>Monitor accounts and exposure, manage demo wallets, control markets, settle events, and review every administrator action.</p>
+      </div>
+      <div class="operations-status"><i class="fa-solid fa-circle"></i> System connected</div>
+    </div>
+
+    <section id="operationsAccessGate" class="operations-access glass">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <h2>Checking administrator access</h2>
+      <p>Please wait while your secure session is verified.</p>
+    </section>
+
+    <section id="operationsDashboard"></section>
+  </main>
+
+  <div class="toast" id="toast"><i class="fa-solid fa-check-circle"></i> <span id="toastMsg">Updated</span></div>
+
+  <script>
+    window.AceUI = {
+      setBalance(value) {
+        const label = document.getElementById('balanceText');
+        if (label) label.textContent = `â‚¹${Number(value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+      },
+      updateBalanceDisplay() {},
+      setHistory() {},
+      renderHistory() {},
+      replaceMarkets() {},
+      renderAllMarkets() {}
+    };
+    window.showToast = function (message, isError) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toastMsg').textContent = message;
+      toast.classList.toggle('error', Boolean(isError));
+      toast.classList.add('show');
+      window.setTimeout(() => toast.classList.remove('show'), 3200);
+    };
+    document.getElementById('avatarBtn').addEventListener('click', function (event) {
+      event.stopPropagation();
+      document.getElementById('userDropdown').classList.toggle('open');
+    });
+    document.addEventListener('click', function () {
+      document.getElementById('userDropdown').classList.remove('open');
+    });
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0/dist/umd/supabase.min.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="supabase-app.js"></script>
+  <script src="platform-features.js"></script>
+</body>
+</html>

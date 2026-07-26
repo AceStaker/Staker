@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ace Staker | Match Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="feature-styles.css">
+</head>
+<body>
+  <canvas id="confettiCanvas"></canvas>
+  <header class="header">
+    <a href="home.html" class="logo" style="text-decoration:none"><i class="fa-solid fa-spade"></i><span>Ace Staker</span></a>
+    <nav><ul class="nav-links">
+      <li><a href="casino.html">Casino</a></li><li><a href="sports.html" class="active">Sports</a></li>
+      <li><a href="live.html">Live</a></li><li><a href="esports.html">Esports</a></li>
+      <li><a href="promotions.html">Promotions</a></li><li><a href="help.html">Help</a></li>
+    </ul></nav>
+    <div class="header-right">
+      <div class="balance-pill" id="balancePill"><i class="fa-solid fa-coins"></i><span id="balanceText">â‚¹0.00</span></div>
+      <div class="avatar-wrap"><div class="avatar" id="avatarBtn">GU<span class="avatar-level" id="avatarLevel">1</span></div>
+        <div class="dropdown glass" id="userDropdown">
+          <a href="#"><i class="fa-solid fa-wallet"></i> Deposit / Withdraw</a>
+          <hr><a href="#"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+          <a href="#"><i class="fa-solid fa-user-plus"></i> Register</a><hr>
+          <button><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</button>
+        </div>
+      </div>
+      <button class="mobile-nav-toggle"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </header>
+  <div class="ticker-wrap"><div class="ticker" id="tickerTrack"></div></div>
+
+  <div class="app-layout">
+    <main class="main-content">
+      <a class="match-detail-link" href="sports.html"><i class="fa-solid fa-arrow-left"></i> Back to sportsbook</a>
+      <div id="matchDetailRoot"><div class="feature-panel">Loading match centerâ€¦</div></div>
+      <h2 class="section-title"><i class="fa-solid fa-chart-line"></i> Primary market</h2>
+      <div class="matches-list" id="matchesList"></div>
+      <footer class="footer">
+        <div class="footer-brand"><div class="logo"><i class="fa-solid fa-spade"></i><span>Ace Staker</span></div>
+          <p>Demo-credit match center. Real sports data is not connected.</p></div>
+        <div class="footer-col"><h5>Support</h5><a href="help.html">Help Center</a><a href="responsible-play.html">Responsible Play</a></div>
+      </footer>
+    </main>
+
+    <button class="betslip-mobile-toggle" id="slipMobileToggle"><i class="fa-solid fa-receipt"></i>
+      <span class="slip-count" id="slipCountBadge" style="display:none">0</span></button>
+    <aside class="betslip glass" id="betslip">
+      <div class="betslip-header"><h3><i class="fa-solid fa-receipt"></i> Betslip <span id="slipCount"></span></h3>
+        <div class="slip-toggle"><button class="active" id="singleModeBtn">Single</button><button id="parlayModeBtn">Multi</button></div></div>
+      <div class="slip-body" id="slipBody"><div class="slip-empty" id="slipEmptyState"><i class="fa-solid fa-receipt"></i> Tap any odds to add your selection</div></div>
+      <div class="stake-section" id="stakeSection" style="display:none">
+        <div class="combo-banner" id="comboBanner"><i class="fa-solid fa-bolt"></i> <span id="comboBannerText"></span></div>
+        <div class="stake-label"><span id="stakeLabel">Stake Amount</span></div>
+        <div class="stake-input-wrap"><span>â‚¹</span><input type="number" id="stakeInput" placeholder="0.00" min="0" step="1"></div>
+        <div class="quick-bets"><button data-add="100">+â‚¹100</button><button data-add="500">+â‚¹500</button>
+          <button data-add="1000">+â‚¹1K</button><button id="maxBetBtn">Max</button></div>
+        <div class="slip-summary" id="parlayOddsSummary" style="display:none"><span>Total Odds</span><b id="combinedOdds">0.00</b></div>
+        <div class="slip-summary" id="comboBoostSummary" style="display:none"><span>Combo Boost</span><b id="comboBoostPct">+0%</b></div>
+        <div class="slip-total"><span>Potential Winnings</span><b id="potentialReturn">â‚¹0.00</b></div>
+        <button class="btn-place" id="placeBetBtn" disabled>PLACE BET</button>
+      </div>
+    </aside>
+  </div>
+
+  <div class="modal-overlay" id="historyModal"><div class="modal glass">
+    <div class="modal-header"><h2>My Profile</h2><button class="modal-close" id="closeModal"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="stat-grid"><div class="stat-box"><div class="val" id="modalBalance">â‚¹0.00</div><div class="lbl">Balance</div></div></div>
+</div>
+    <div id="achvGrid"></div><table class="history"><tbody id="historyTableBody"></tbody></table>
+  </div></div>
+  <div class="toast" id="toast"><i class="fa-solid fa-check-circle"></i> <span id="toastMsg">Updated</span></div>
+  <div class="achieve-toast" id="achieveToast"><div><div id="achieveName"></div><div id="achieveDesc"></div></div></div>
+  <div class="winfeed-stack" id="winfeedStack"></div>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0/dist/umd/supabase.min.js"></script>
+  <script src="supabase-config.js"></script>
+  <script src="script.js"></script>
+  <script src="supabase-app.js"></script>
+  <script src="platform-features.js"></script>
+</body>
+</html>
