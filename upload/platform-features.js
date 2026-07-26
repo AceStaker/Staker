@@ -209,18 +209,36 @@
   }
 
   async function mountCashOut() {
-    const modal = document.querySelector('#historyModal .modal');
-    if (!modal || document.getElementById('cashOutPanel')) return;
-    modal.insertAdjacentHTML('beforeend', `
-      <section class="feature-panel" id="cashOutPanel">
-        <div class="feature-panel-head">
-          <div><h3><i class="fa-solid fa-money-bill-transfer"></i> Open bets &amp; demo cash-out</h3>
-          <p>Offers are calculated by the server and paid only after administrator approval.</p></div>
-          <button class="feature-action" type="button" id="refreshCashOut">Refresh</button>
+    if (document.getElementById('cashOutModal')) return;
+    document.body.insertAdjacentHTML('beforeend', `
+      <div class="modal-overlay account-modal" id="cashOutModal" aria-hidden="true">
+        <div class="modal glass account-panel wide-panel" role="dialog" aria-modal="true" aria-labelledby="cashOutTitle">
+          <button class="modal-close" type="button" data-close-cashout aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+          <h2 id="cashOutTitle"><i class="fa-solid fa-money-bill-transfer"></i> Cash Out</h2>
+          <section class="feature-panel" id="cashOutPanel">
+            <div class="feature-panel-head">
+              <div><h3>Eligible open bets</h3>
+              <p>Submit an offer request here. Funds are credited only after administrator approval.</p></div>
+              <button class="feature-action" type="button" id="refreshCashOut">Refresh</button>
+            </div>
+            <div id="cashOutList"><div class="panel-empty">Loading eligible bets…</div></div>
+          </section>
         </div>
-        <div id="cashOutList"><div class="panel-empty">Sign in to view eligible bets.</div></div>
-      </section>`);
+      </div>`);
     document.getElementById('refreshCashOut').addEventListener('click', loadCashOuts);
+    document.querySelector('[data-close-cashout]').addEventListener('click', () => {
+      document.getElementById('cashOutModal').classList.remove('open');
+    });
+    document.getElementById('cashOutModal').addEventListener('click', event => {
+      if (event.target.id === 'cashOutModal') event.currentTarget.classList.remove('open');
+    });
+    await loadCashOuts();
+  }
+
+  async function openCashOut() {
+    if (!sessionDetail.user) return window.openAceAuth(false);
+    await mountCashOut();
+    document.getElementById('cashOutModal').classList.add('open');
     await loadCashOuts();
   }
 
@@ -762,6 +780,11 @@
     applyPlatformStatus();
     if (sessionDetail.user) await Promise.all([loadExperience(), mountCashOut(), loadMyTickets()]);
   }
+
+  window.AceCashOut = {
+    open: openCashOut,
+    refresh: loadCashOuts
+  };
 
   window.addEventListener('ace:session', async event => {
     sessionDetail = event.detail;

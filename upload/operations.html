@@ -93,6 +93,12 @@
     document.addEventListener('click', function () {
       document.getElementById('userDropdown').classList.remove('open');
     });
+    document.getElementById('balancePill').addEventListener('click', function () {
+      if (window.AceBackend) window.AceBackend.openWallet();
+      else window.addEventListener('ace:ready', function () {
+        window.AceBackend.openWallet();
+      }, { once: true });
+    });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0/dist/umd/supabase.min.js"></script>
   <script src="supabase-config.js"></script>

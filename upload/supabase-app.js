@@ -78,6 +78,9 @@
             <strong id="walletPanelBalance">₹0.00</strong>
           </div>
           <p class="panel-note">Payments are not connected. This wallet cannot receive deposits or make withdrawals.</p>
+          <button class="feature-action wallet-cashout-cta" type="button" id="walletCashOutBtn">
+            <i class="fa-solid fa-money-bill-transfer"></i> Cash Out Eligible Bet
+          </button>
           <h3>Recent activity</h3>
           <div id="walletActivity" class="activity-list"><div class="panel-empty">Sign in to view activity.</div></div>
         </div>
@@ -315,6 +318,10 @@
     });
 
     document.getElementById('responsibleForm').addEventListener('submit', saveResponsiblePlay);
+    document.getElementById('walletCashOutBtn').addEventListener('click', () => {
+      document.getElementById('walletModal').classList.remove('open');
+      window.AceCashOut?.open();
+    });
     document.getElementById('adminEventForm').addEventListener('submit', createAdminEvent);
     document.getElementById('adminUserSearch').addEventListener('submit', event => {
       event.preventDefault();
@@ -454,6 +461,18 @@
         openResponsiblePlay();
       });
       hr.before(responsible);
+
+      const cashOut = document.createElement('a');
+      cashOut.href = '#';
+      cashOut.dataset.signedInOnly = 'true';
+      cashOut.dataset.mobileAccount = 'true';
+      cashOut.dataset.cashoutAction = 'true';
+      cashOut.innerHTML = '<i class="fa-solid fa-money-bill-transfer"></i> Cash Out';
+      cashOut.addEventListener('click', event => {
+        event.preventDefault();
+        window.AceCashOut?.open();
+      });
+      hr.before(cashOut);
 
       const admin = document.createElement('a');
       admin.href = 'operations.html';

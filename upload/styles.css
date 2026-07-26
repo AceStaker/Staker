@@ -1277,9 +1277,17 @@ table.history td{ padding:9px 8px; border-bottom:1px solid rgba(255,255,255,.05)
 .balance-pill{ cursor:pointer; }
 .mobile-account-item,.mobile-auth-item{ display:none; }
 .mobile-profile-menu{
-  width:100%; border:1px solid var(--border); border-radius:10px; padding:10px 12px;
-  color:var(--text); background:rgba(255,255,255,.04); text-align:left; font:inherit;
+  width:100%; border:1px solid var(--glass-border); border-radius:10px; padding:8px 10px;
+  color:var(--text-main); background:rgba(255,255,255,.04); text-align:left; font:inherit;
+  display:flex; align-items:center; gap:10px;
 }
+.mobile-account-avatar{
+  width:34px; height:34px; border-radius:50%; display:grid; place-items:center; flex:0 0 auto;
+  color:#111; background:linear-gradient(135deg,var(--gold),var(--gold-bright)); font-weight:900;
+}
+.mobile-account-name{ flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:700; }
+.mobile-account-chevron{ color:var(--text-dim); font-size:.75rem; }
+.wallet-cashout-cta{ width:100%; justify-content:center; margin:0 0 8px; }
 @media (max-width:860px){
   .avatar-wrap>.avatar{ display:none; }
   .mobile-account-item,.mobile-auth-item{ display:block; }
@@ -1290,7 +1298,8 @@ table.history td{ padding:9px 8px; border-bottom:1px solid rgba(255,255,255,.05)
   .mobile-account-item .dropdown>*{ display:none!important; }
   .mobile-account-item .dropdown #profileBtn,
   .mobile-account-item .dropdown #historyBtn,
-  .mobile-account-item .dropdown [data-mobile-account="true"]{ display:flex!important; }
+  .mobile-account-item .dropdown [data-mobile-account="true"],
+  .mobile-account-item .dropdown [data-auth-action="logout"]{ display:flex!important; }
   .mobile-account-item .dropdown [data-mobile-account="true"][style*="display: none"]{ display:none!important; }
   .mobile-auth-button{
     width:100%; border:1px solid var(--glass-border); border-radius:10px; padding:11px 12px;

@@ -1053,13 +1053,42 @@ if(betslip && slipMobileToggleBtn){
   });
 }
 
+let mobileSession = { user: null, profile: null, isAdmin: false };
+
+function syncMobileAccount(detail = mobileSession){
+  mobileSession = detail || { user: null, profile: null, isAdmin: false };
+  const accountItem = document.querySelector('.mobile-account-item');
+  const loginItem = document.querySelector('.mobile-auth-item');
+  if(!accountItem || !loginItem) return;
+
+  const signedIn = Boolean(mobileSession.user);
+  accountItem.style.display = signedIn ? 'block' : 'none';
+  loginItem.style.display = signedIn ? 'none' : 'block';
+  userDropdown.classList.remove('open');
+
+  if(signedIn){
+    const name = mobileSession.profile?.display_name
+      || mobileSession.user.email?.split('@')[0]
+      || 'Account';
+    const initials = name.split(/\s+/).map(word => word[0]).join('').slice(0,2).toUpperCase();
+    accountItem.querySelector('.mobile-account-avatar').textContent = initials;
+    accountItem.querySelector('.mobile-account-name').textContent = name;
+  }
+}
+
+window.addEventListener('ace:session', event => syncMobileAccount(event.detail));
+
 // Mobile nav (simple slide toggle re-using nav-links display)
 document.querySelector('.mobile-nav-toggle').addEventListener('click', ()=>{
   const nav = document.querySelector('.nav-links');
   if(!nav.querySelector('.mobile-account-item')){
     const item = document.createElement('li');
     item.className = 'mobile-account-item';
-    item.innerHTML = '<button type="button" class="mobile-profile-menu"><i class="fa-solid fa-user"></i> Profile</button>';
+    item.innerHTML = `<button type="button" class="mobile-profile-menu">
+      <span class="mobile-account-avatar">AS</span>
+      <span class="mobile-account-name">Account</span>
+      <i class="fa-solid fa-chevron-down mobile-account-chevron"></i>
+    </button>`;
     item.appendChild(userDropdown);
     item.querySelector('button').addEventListener('click', event => {
       event.stopPropagation();
@@ -1070,19 +1099,11 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', ()=>{
     const authItem = document.createElement('li');
     authItem.className = 'mobile-auth-item';
     authItem.innerHTML = '<button type="button" class="mobile-auth-button"><i class="fa-solid fa-right-to-bracket"></i> Login</button>';
-    const authButton = authItem.querySelector('button');
-    authButton.addEventListener('click', () => {
-      const action = authButton.dataset.signedIn === 'true' ? 'logout' : 'login';
-      document.querySelector(`[data-auth-action="${action}"]`)?.click();
+    authItem.querySelector('button').addEventListener('click', () => {
+      document.querySelector('[data-auth-action="login"]')?.click();
     });
     nav.appendChild(authItem);
-    window.addEventListener('ace:session', event => {
-      const signedIn = Boolean(event.detail?.user);
-      authButton.dataset.signedIn = String(signedIn);
-      authButton.innerHTML = signedIn
-        ? '<i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out'
-        : '<i class="fa-solid fa-right-to-bracket"></i> Login';
-    });
+    syncMobileAccount();
   }
   nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
   nav.style.cssText += 'position:absolute; top:64px; left:0; right:0; flex-direction:column; background:rgba(10,10,15,.95); padding:16px; gap:16px; z-index:99;';
