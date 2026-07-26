@@ -189,10 +189,7 @@
 
   async function loadExperience() {
     if (!sessionDetail.user) return;
-    const [{ data: experience }, { data: leaders }] = await Promise.all([
-      client().rpc('account_experience'),
-      client().rpc('loyalty_leaderboard', { p_limit: 20 })
-    ]);
+    const { data: experience } = await client().rpc('account_experience');
     if (experience) {
       const rankText = document.getElementById('rankPillText');
       const level = document.getElementById('levelNum');
@@ -208,15 +205,6 @@
       if (xpCurrent) xpCurrent.textContent = experience.points;
       if (xpNeeded) xpNeeded.textContent = experience.next_level_points;
       if (fill) fill.style.width = `${Math.min(100, (experience.points % 500) / 5)}%`;
-    }
-    const board = document.getElementById('leaderboardList');
-    if (board && leaders?.length) {
-      board.innerHTML = leaders.map(row => `
-        <div class="leader-row">
-          <div class="leader-pos ${row.rank <= 3 ? `top${row.rank}` : ''}">#${row.rank}</div>
-          <div class="leader-name">${esc(row.display_name)} <span class="tier-chip">${esc(row.tier)}</span></div>
-          <div class="leader-xp">${Number(row.points).toLocaleString('en-IN')} pts</div>
-        </div>`).join('');
     }
   }
 

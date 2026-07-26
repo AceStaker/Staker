@@ -447,6 +447,7 @@
       const responsible = document.createElement('a');
       responsible.href = '#';
       responsible.dataset.signedInOnly = 'true';
+      responsible.dataset.mobileAccount = 'true';
       responsible.innerHTML = '<i class="fa-solid fa-shield-heart"></i> Responsible Play';
       responsible.addEventListener('click', event => {
         event.preventDefault();
@@ -457,6 +458,7 @@
       const admin = document.createElement('a');
       admin.href = 'operations.html';
       admin.dataset.adminOnly = 'true';
+      admin.dataset.mobileAccount = 'true';
       admin.style.display = 'none';
       admin.innerHTML = '<i class="fa-solid fa-user-shield"></i> Operations';
       admin.addEventListener('click', event => {

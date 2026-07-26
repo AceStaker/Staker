@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -31,7 +31,7 @@
       </a>
       <div class="balance-pill" id="balancePill">
         <i class="fa-solid fa-coins"></i>
-        <span class="balance-text" id="balanceText">â‚¹0.00</span>
+        <span class="balance-text" id="balanceText">₹0.00</span>
       </div>
       <div class="avatar-wrap">
         <div class="avatar" id="avatarBtn">GU<span class="avatar-level" id="avatarLevel">A</span></div>
@@ -71,7 +71,7 @@
     window.AceUI = {
       setBalance(value) {
         const label = document.getElementById('balanceText');
-        if (label) label.textContent = `â‚¹${Number(value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        if (label) label.textContent = `₹${Number(value || 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
       },
       updateBalanceDisplay() {},
       setHistory() {},

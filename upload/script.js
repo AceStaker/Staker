@@ -1,13 +1,13 @@
 /* =========================================================
    ACE STAKER — APP LOGIC (Vanilla ES6+)
    Sections:
-   1. Mock Data (matches, sports, history, leaderboard, promos, faq)
+   1. Mock Data (matches, sports, history, promos, faq)
    2. State (incl. gamification: level/xp/rank/streak/achievements)
    3. Render: Ticker / Sport Tabs / Matches / Trending bars
    4. Bet Slip logic (add/remove, single vs parlay, combo boost, payout calc)
    5. Gamification engine: XP, levels, ranks, streaks, achievements, confetti
-   6. Simulated live updates (odds, ticker, big-win feed, leaderboard) via setInterval
-   7. Extra content: Leaderboard / Promotions / FAQ render
+   6. Simulated live updates (odds, ticker, big-win feed) via setInterval
+   7. Extra content: Promotions / FAQ render
    8. Modals, dropdown, theme toggle, mobile nav, smooth-scroll nav filters
    ========================================================= */
 
@@ -68,16 +68,6 @@ if(typeof PAGE_FILTER !== 'undefined'){
 
 // Mock betting history for the profile modal
 let historyData = [];
-
-// Weekly leaderboard mock — "me" flags the current player's row
-let leaderboardData = [
-  { name:"VegasVortex", tier:"Ace", profit:8420, streak:6 },
-  { name:"ClutchQueen", tier:"Diamond", profit:6110, streak:4 },
-  { name:"you (Tafeem S.)", tier:"Gold", profit:3980, streak:0, me:true },
-  { name:"BankrollBaron", tier:"Diamond", profit:3350, streak:2 },
-  { name:"ParlayPete", tier:"Platinum", profit:2790, streak:1 },
-  { name:"OddsWhisperer", tier:"Gold", profit:1980, streak:0 },
-];
 
 const promotions = [
   { icon:"fa-flask", tag:"DEMO", title:"₹10,000 Welcome Credits", desc:"Every confirmed demo account receives test credits with no cash value.", cta:"Create Demo Account" },
@@ -961,32 +951,7 @@ setInterval(()=>{
   renderTicker();
 }, 9000);
 
-// Leaderboard gently reshuffles to feel "live"
-setInterval(()=>{
-  if(backendMarketsActive) return;
-  leaderboardData.forEach(p=>{
-    if(!p.me) p.profit += Math.floor((Math.random()-0.3)*120);
-  });
-  leaderboardData.sort((a,b)=> b.profit - a.profit);
-  renderLeaderboard();
-}, 7000);
-
-/* ---------- 7. EXTRA CONTENT: Leaderboard / Promotions / FAQ ---------- */
-
-function renderLeaderboard(){
-  const wrap = document.getElementById('leaderboardList');
-  if(!wrap) return; // only present on sports/live/esports pages
-  wrap.innerHTML = leaderboardData.map((p, i) => {
-    const rankClass = i===0?'top1':i===1?'top2':i===2?'top3':'';
-    return `
-    <div class="leader-row ${p.me?'me':''}">
-      <div class="leader-rank ${rankClass}">${i+1}</div>
-      <div class="leader-name">${p.name} <span class="leader-tier">${p.tier}</span></div>
-      <div class="leader-streak">${p.streak > 0 ? `<i class="fa-solid fa-fire" style="color:var(--crimson);"></i> ${p.streak}` : ''}</div>
-      <div class="leader-profit">+₹${p.profit.toLocaleString('en-IN')}</div>
-    </div>`;
-  }).join('');
-}
+/* ---------- 7. EXTRA CONTENT: Promotions / FAQ ---------- */
 
 function renderPromotions(){
   const grid = document.getElementById('promoGrid');
@@ -1054,17 +1019,6 @@ function openProfileModal(e){
 }
 document.getElementById('historyBtn').addEventListener('click', openProfileModal);
 document.getElementById('profileBtn').addEventListener('click', openProfileModal);
-document.getElementById('leaderboardBtn').addEventListener('click', (e)=>{
-  e.preventDefault();
-  userDropdown.classList.remove('open');
-  const leaderboardSection = document.getElementById('leaderboardSection');
-  if(leaderboardSection){
-    leaderboardSection.scrollIntoView({behavior:'smooth'});
-  } else {
-    // Leaderboard only lives on the Casino/home page — jump there
-    window.location.href = 'casino.html#leaderboardSection';
-  }
-});
 document.getElementById('balancePill')?.addEventListener('click', openProfileModal);
 document.getElementById('closeModal').addEventListener('click', ()=> historyModal.classList.remove('open'));
 historyModal.addEventListener('click', (e)=>{ if(e.target === historyModal) historyModal.classList.remove('open'); });
@@ -1106,11 +1060,29 @@ document.querySelector('.mobile-nav-toggle').addEventListener('click', ()=>{
     const item = document.createElement('li');
     item.className = 'mobile-account-item';
     item.innerHTML = '<button type="button" class="mobile-profile-menu"><i class="fa-solid fa-user"></i> Profile</button>';
+    item.appendChild(userDropdown);
     item.querySelector('button').addEventListener('click', event => {
       event.stopPropagation();
       userDropdown.classList.toggle('open');
     });
     nav.appendChild(item);
+
+    const authItem = document.createElement('li');
+    authItem.className = 'mobile-auth-item';
+    authItem.innerHTML = '<button type="button" class="mobile-auth-button"><i class="fa-solid fa-right-to-bracket"></i> Login</button>';
+    const authButton = authItem.querySelector('button');
+    authButton.addEventListener('click', () => {
+      const action = authButton.dataset.signedIn === 'true' ? 'logout' : 'login';
+      document.querySelector(`[data-auth-action="${action}"]`)?.click();
+    });
+    nav.appendChild(authItem);
+    window.addEventListener('ace:session', event => {
+      const signedIn = Boolean(event.detail?.user);
+      authButton.dataset.signedIn = String(signedIn);
+      authButton.innerHTML = signedIn
+        ? '<i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out'
+        : '<i class="fa-solid fa-right-to-bracket"></i> Login';
+    });
   }
   nav.style.display = nav.style.display === 'flex' ? 'none' : 'flex';
   nav.style.cssText += 'position:absolute; top:64px; left:0; right:0; flex-direction:column; background:rgba(10,10,15,.95); padding:16px; gap:16px; z-index:99;';
@@ -1129,7 +1101,6 @@ function init(){
   renderSlip();
   renderHistory();
   renderAchievements();
-  renderLeaderboard();
   renderPromotions();
   renderFAQ();
   renderCasinoLobbyTabs();

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -15,7 +15,7 @@
 </head>
 <body>
 
-<!-- Confetti overlay canvas â€” used for level-ups and big parlay wins -->
+<!-- Confetti overlay canvas — used for level-ups and big parlay wins -->
 <canvas id="confettiCanvas"></canvas>
 
 <!-- =========================================================
@@ -41,7 +41,7 @@
   <div class="header-right">
 <div class="balance-pill" id="balancePill">
       <i class="fa-solid fa-coins"></i>
-      <span class="balance-text" id="balanceText">â‚¹12,450.00</span>
+      <span class="balance-text" id="balanceText">₹12,450.00</span>
     </div>
 
     <div class="avatar-wrap">
@@ -49,7 +49,6 @@
       <div class="dropdown glass" id="userDropdown">
         <a href="#" id="profileBtn"><i class="fa-solid fa-user"></i> My Profile</a>
         <a href="#" id="historyBtn"><i class="fa-solid fa-clock-rotate-left"></i> Betting History</a>
-        <a href="#" id="leaderboardBtn"><i class="fa-solid fa-ranking-star"></i> Leaderboard</a>
         <a href="#"><i class="fa-solid fa-wallet"></i> Deposit / Withdraw</a>
         <hr>
         <a href="#"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
@@ -64,7 +63,7 @@
 </header>
 
 <!-- =========================================================
-     LIVE SCORE / BIG WIN TICKER â€” content duplicated once so the
+     LIVE SCORE / BIG WIN TICKER — content duplicated once so the
      translateX(-50%) keyframe loops seamlessly. Big wins are
      spliced in by JS to keep the marquee feeling alive.
      ========================================================= -->
@@ -80,14 +79,14 @@
   <main class="main-content">
 
     <!-- =========================================================
-         CASINO LOBBY â€” Dafabet-style game gallery: category tabs,
+         CASINO LOBBY — Dafabet-style game gallery: category tabs,
          search box, and thumbnail tiles showcasing the game catalog.
          ========================================================= -->
     <section class="casino-hero glass" id="casinoSection">
       <div class="casino-hero-text">
         <span class="hero-tag" style="background:rgba(155,93,229,.18); color:#d9c4ff;">CASINO FLOOR</span>
         <h2>500+ Games. One Lobby. <span>Endless Ways to Play.</span></h2>
-        <p>Live-dealer roulette, blackjack, baccarat, and a full slot library â€” browse the full collection below.</p>
+        <p>Live-dealer roulette, blackjack, baccarat, and a full slot library — browse the full collection below.</p>
       </div>
     </section>
 
@@ -134,12 +133,12 @@
         <a href="help.html">Terms &amp; Privacy</a>
       </div>
     </footer>
-    <div class="footer-bottom">Â© 2026 Ace Staker. For entertainment simulation only â€” no real money is wagered on this demo.</div>
+    <div class="footer-bottom">© 2026 Ace Staker. For entertainment simulation only — no real money is wagered on this demo.</div>
 
   </main>
 
   <!-- =========================================================
-       BET SLIP â€” persistent sidebar (core feature)
+       BET SLIP — persistent sidebar (core feature)
        ========================================================= -->
   <button class="betslip-mobile-toggle" id="slipMobileToggle">
     <i class="fa-solid fa-receipt"></i>
@@ -162,20 +161,20 @@
       </div>
     </div>
 
-    <!-- Stake + payout â€” hidden when slip is empty -->
+    <!-- Stake + payout — hidden when slip is empty -->
     <div class="stake-section" id="stakeSection" style="display:none;">
       <!-- Combo boost banner: rewards bigger parlays with a bonus payout multiplier -->
       <div class="combo-banner" id="comboBanner"><i class="fa-solid fa-bolt"></i> <span id="comboBannerText">3-Leg Combo: +5% Boost!</span></div>
 
       <div class="stake-label"><span id="stakeLabel">Stake Amount</span></div>
       <div class="stake-input-wrap">
-        <span>â‚¹</span>
+        <span>₹</span>
         <input type="number" id="stakeInput" placeholder="0.00" min="0" step="1">
       </div>
       <div class="quick-bets">
-        <button data-add="100">+â‚¹100</button>
-        <button data-add="500">+â‚¹500</button>
-        <button data-add="1000">+â‚¹1K</button>
+        <button data-add="100">+₹100</button>
+        <button data-add="500">+₹500</button>
+        <button data-add="1000">+₹1K</button>
         <button id="maxBetBtn">Max</button>
       </div>
 
@@ -187,7 +186,7 @@
       </div>
       <div class="slip-total">
         <span>Potential Winnings</span>
-        <b id="potentialReturn">â‚¹0.00</b>
+        <b id="potentialReturn">₹0.00</b>
       </div>
       <button class="btn-place" id="placeBetBtn" disabled>PLACE BET</button>
     </div>
@@ -205,9 +204,7 @@
     </div>
 
     <div class="stat-grid">
-      <div class="stat-box"><div class="val" id="modalBalance">â‚¹12,450.00</div><div class="lbl">Current Balance</div></div>
-    </div>
-
+      <div class="stat-box"><div class="val" id="modalBalance">₹12,450.00</div><div class="lbl">Current Balance</div></div>
     </div>
 
     <h3 style="font-family:var(--font-display); margin-bottom:10px; font-size:1.05rem;">Achievements</h3>

@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -15,10 +15,10 @@
 </head>
 <body>
 
-<!-- Neon ambient background â€” Home page only, see styles.css -->
+<!-- Neon ambient background — Home page only, see styles.css -->
 <div class="home-glow-bg"></div>
 
-<!-- Confetti overlay canvas â€” used for level-ups and big parlay wins -->
+<!-- Confetti overlay canvas — used for level-ups and big parlay wins -->
 <canvas id="confettiCanvas"></canvas>
 
 <!-- =========================================================
@@ -44,7 +44,7 @@
   <div class="header-right">
 <div class="balance-pill" id="balancePill">
       <i class="fa-solid fa-coins"></i>
-      <span class="balance-text" id="balanceText">â‚¹12,450.00</span>
+      <span class="balance-text" id="balanceText">₹12,450.00</span>
     </div>
 
     <div class="avatar-wrap">
@@ -52,7 +52,6 @@
       <div class="dropdown glass" id="userDropdown">
         <a href="#" id="profileBtn"><i class="fa-solid fa-user"></i> My Profile</a>
         <a href="#" id="historyBtn"><i class="fa-solid fa-clock-rotate-left"></i> Betting History</a>
-        <a href="#" id="leaderboardBtn"><i class="fa-solid fa-ranking-star"></i> Leaderboard</a>
         <a href="#"><i class="fa-solid fa-wallet"></i> Deposit / Withdraw</a>
         <hr>
         <a href="#"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
@@ -67,7 +66,7 @@
 </header>
 
 <!-- =========================================================
-     LIVE SCORE / BIG WIN TICKER â€” content duplicated once so the
+     LIVE SCORE / BIG WIN TICKER — content duplicated once so the
      translateX(-50%) keyframe loops seamlessly. Big wins are
      spliced in by JS to keep the marquee feeling alive.
      ========================================================= -->
@@ -76,7 +75,7 @@
 </div>
 
 <!-- =========================================================
-     MAIN APP LAYOUT â€” Home has no bet slip, so "no-betslip" gives
+     MAIN APP LAYOUT — Home has no bet slip, so "no-betslip" gives
      the main content the full width.
      ========================================================= -->
 <div class="app-layout no-betslip">
@@ -84,7 +83,7 @@
   <main class="main-content">
 
     <!-- =========================================================
-         LIVE SCOREBOARD â€” betting-app style strip of live/upcoming
+         LIVE SCOREBOARD — betting-app style strip of live/upcoming
          match scores across all sports, scroll to see more, click
          a card to jump into that sport's odds.
          ========================================================= -->
@@ -92,7 +91,7 @@
       <div class="scoreboard-header">
         <h2 class="section-title" style="margin:0;"><i class="fa-solid fa-tower-broadcast"></i> Live Scoreboard</h2>
         <div class="scoreboard-controls">
-          <span class="scoreboard-count" id="homeScoreboardCount">Loading gamesâ€¦</span>
+          <span class="scoreboard-count" id="homeScoreboardCount">Loading games…</span>
           <button type="button" class="scoreboard-arrow" id="scoreboardPrev" aria-label="Previous games"><i class="fa-solid fa-chevron-left"></i></button>
           <button type="button" class="scoreboard-arrow" id="scoreboardNext" aria-label="Next games"><i class="fa-solid fa-chevron-right"></i></button>
           <a href="sports.html" class="scoreboard-viewall">See all games <i class="fa-solid fa-arrow-right"></i></a>
@@ -101,12 +100,12 @@
       <div class="scoreboard-scroll" id="homeScoreboard"><!-- populated by JS --></div>
     </section>
 
-    <!-- CASINO BANNER â€” intentionally second, directly below the scoreboard -->
+    <!-- CASINO BANNER — intentionally second, directly below the scoreboard -->
     <section class="home-casino-banner">
       <div class="home-casino-copy">
         <span class="home-casino-kicker"><i class="fa-solid fa-sparkles"></i> ACE CASINO</span>
         <h1>Your seat is ready. <span>Let the games begin.</span></h1>
-        <p>Explore a colorful casino lobby filled with live tables, roulette, blackjack, baccarat, slots, and jackpotsâ€”all powered by demo credits.</p>
+        <p>Explore a colorful casino lobby filled with live tables, roulette, blackjack, baccarat, slots, and jackpots—all powered by demo credits.</p>
         <div class="home-casino-actions">
           <a class="casino-primary" href="casino.html">Enter Casino <i class="fa-solid fa-arrow-right"></i></a>
           <a class="casino-secondary" href="casino.html#casinoSection"><i class="fa-solid fa-fire"></i> Browse Popular Games</a>
@@ -148,32 +147,28 @@
     <div class="home-game-row">
       <a class="home-game-cover" href="casino.html">
         <img src="lightning-roulette.webp" alt="Lightning Roulette wheel surrounded by golden lightning" width="1199" height="675" loading="lazy" decoding="async">
-        <h4>Lightning Roulette</h4><span>Live table Â· Popular</span>
+        <h4>Lightning Roulette</h4><span>Live table · Popular</span>
       </a>
       <a class="home-game-cover" href="casino.html">
         <img src="vip-blackjack.webp" alt="VIP Blackjack cards and chips on an emerald casino table" width="1199" height="675" loading="lazy" decoding="async">
-        <h4>VIP Blackjack</h4><span>Live dealer Â· Cards</span>
+        <h4>VIP Blackjack</h4><span>Live dealer · Cards</span>
       </a>
       <a class="home-game-cover" href="casino.html">
         <img src="golden-reels.webp" alt="Golden slot-machine reels with purple jeweled symbols" width="1199" height="675" loading="lazy" decoding="async">
-        <h4>Golden Reels</h4><span>Slots Â· Featured</span>
+        <h4>Golden Reels</h4><span>Slots · Featured</span>
       </a>
       <a class="home-game-cover" href="casino.html">
         <img src="lucky-dice.webp" alt="Lucky ivory dice and casino chips in a red glow" width="1199" height="675" loading="lazy" decoding="async">
-        <h4>Lucky Dice</h4><span>Instant Â· New</span>
+        <h4>Lucky Dice</h4><span>Instant · New</span>
       </a>
     </div>
 
     <div class="home-stats-grid">
       <div class="stat-box"><div class="val">6</div><div class="lbl">Demo Markets</div></div>
-      <div class="stat-box"><div class="val">â‚¹10K</div><div class="lbl">Welcome Credits</div></div>
+      <div class="stat-box"><div class="val">₹10K</div><div class="lbl">Welcome Credits</div></div>
       <div class="stat-box"><div class="val">100%</div><div class="lbl">Server-Validated</div></div>
       <div class="stat-box"><div class="val">18+</div><div class="lbl">Adults Only</div></div>
     </div>
-
-    <!-- LEADERBOARD -->
-    <h2 class="section-title" id="leaderboardSection"><i class="fa-solid fa-ranking-star"></i> Top Stakers This Week</h2>
-    <div class="leaderboard glass" id="leaderboardList" style="padding:8px;"><!-- populated by JS --></div>
 
     <!-- FOOTER -->
     <footer class="footer">
@@ -208,7 +203,7 @@
         <a href="help.html">Terms &amp; Privacy</a>
       </div>
     </footer>
-    <div class="footer-bottom">Â© 2026 Ace Staker. For entertainment simulation only â€” no real money is wagered on this demo.</div>
+    <div class="footer-bottom">© 2026 Ace Staker. For entertainment simulation only — no real money is wagered on this demo.</div>
 
   </main>
 </div>
@@ -224,9 +219,7 @@
     </div>
 
     <div class="stat-grid">
-      <div class="stat-box"><div class="val" id="modalBalance">â‚¹12,450.00</div><div class="lbl">Current Balance</div></div>
-    </div>
-
+      <div class="stat-box"><div class="val" id="modalBalance">₹12,450.00</div><div class="lbl">Current Balance</div></div>
     </div>
 
     <h3 style="font-family:var(--font-display); margin-bottom:10px; font-size:1.05rem;">Achievements</h3>
