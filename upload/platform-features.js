@@ -214,18 +214,28 @@
       <div class="modal-overlay account-modal" id="cashOutModal" aria-hidden="true">
         <div class="modal glass account-panel wide-panel" role="dialog" aria-modal="true" aria-labelledby="cashOutTitle">
           <button class="modal-close" type="button" data-close-cashout aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
-          <h2 id="cashOutTitle"><i class="fa-solid fa-money-bill-transfer"></i> Cash Out</h2>
+          <h2 id="cashOutTitle"><i class="fa-solid fa-money-bill-transfer"></i> Withdraw Balance</h2>
           <section class="feature-panel" id="cashOutPanel">
             <div class="feature-panel-head">
-              <div><h3>Eligible open bets</h3>
-              <p>Submit an offer request here. Funds are credited only after administrator approval.</p></div>
+              <div><h3>Request a withdrawal</h3>
+              <p>Enter an amount from your available balance. It will be reserved immediately and reviewed by an administrator.</p></div>
               <button class="feature-action" type="button" id="refreshCashOut">Refresh</button>
             </div>
-            <div id="cashOutList"><div class="panel-empty">Loading eligible bets…</div></div>
+            <form class="feature-form withdrawal-form" id="withdrawalForm">
+              <label>Amount to withdraw (₹)
+                <input id="withdrawalAmount" type="number" min="1" step="0.01" inputmode="decimal" required placeholder="0.00">
+              </label>
+              <button type="submit"><i class="fa-solid fa-paper-plane"></i> Request Withdrawal</button>
+            </form>
+            <div class="withdrawal-balance">Available balance <strong id="withdrawalBalance">₹0.00</strong></div>
+            <p class="panel-note">Ace Staker currently uses demo credits. Approval records the request; no bank or payment-provider transfer is connected.</p>
+            <h3 class="withdrawal-history-title">Your withdrawal requests</h3>
+            <div id="cashOutList"><div class="panel-empty">Loading requests…</div></div>
           </section>
         </div>
       </div>`);
     document.getElementById('refreshCashOut').addEventListener('click', loadCashOuts);
+    document.getElementById('withdrawalForm').addEventListener('submit', requestWithdrawal);
     document.querySelector('[data-close-cashout]').addEventListener('click', () => {
       document.getElementById('cashOutModal').classList.remove('open');
     });
@@ -246,38 +256,60 @@
     const list = document.getElementById('cashOutList');
     if (!list || !sessionDetail.user) return;
     if (!enabled('cash_out')) {
-      list.innerHTML = '<div class="panel-empty">Cash-out is currently disabled.</div>';
+      list.innerHTML = '<div class="panel-empty">Withdrawals are currently disabled.</div>';
+      const disabledButton = document.getElementById('withdrawalForm')?.querySelector('button');
+      if (disabledButton) disabledButton.disabled = true;
       return;
     }
-    list.innerHTML = '<div class="panel-empty">Loading eligible bets…</div>';
-    const { data, error } = await client().from('bets')
-      .select('id,kind,stake,potential_payout,total_odds,placed_at,bet_legs(selection_label)')
-      .eq('status', 'pending').order('placed_at', { ascending: false }).limit(30);
-    if (error) {
-      list.innerHTML = `<div class="panel-empty">${esc(error.message)}</div>`;
+    const formButton = document.getElementById('withdrawalForm')?.querySelector('button');
+    if (formButton) formButton.disabled = false;
+    list.innerHTML = '<div class="panel-empty">Loading requests…</div>';
+    const [{ data: wallet, error: walletError }, { data, error }] = await Promise.all([
+      client().from('wallets').select('balance').single(),
+      client().from('withdrawal_requests')
+        .select('id,amount,currency,status,requested_at,reviewed_at,admin_note')
+        .order('requested_at', { ascending: false }).limit(30)
+    ]);
+    if (walletError || error) {
+      const problem = walletError || error;
+      list.innerHTML = `<div class="panel-empty">${esc(problem.message)}</div>`;
       return;
     }
-    list.innerHTML = data?.length ? data.map(bet => {
-      const offer = Math.max(Number(bet.stake) * .6,
-        Math.min(Number(bet.potential_payout) * .72, Number(bet.stake) * 1.5));
+    const available = Number(wallet?.balance || 0);
+    const balance = document.getElementById('withdrawalBalance');
+    const amount = document.getElementById('withdrawalAmount');
+    if (balance) balance.textContent = money(available);
+    if (amount) amount.max = String(available);
+    list.innerHTML = data?.length ? data.map(request => {
+      const reviewed = request.reviewed_at
+        ? ` · Reviewed ${new Date(request.reviewed_at).toLocaleString()}`
+        : '';
       return `<div class="cashout-row">
-        <div><strong>${bet.kind === 'parlay' ? `${bet.bet_legs.length}-leg parlay` : esc(bet.bet_legs[0]?.selection_label || 'Single bet')}</strong>
-        <small>${money(bet.stake)} at ${Number(bet.total_odds).toFixed(2)} · ${new Date(bet.placed_at).toLocaleString()}</small></div>
-        <div class="cashout-offer"><b>${money(offer)}</b>
-        <button class="feature-action" data-cashout="${bet.id}">Request cash-out</button></div>
+        <div><strong>${money(request.amount)}</strong>
+          <small>Requested ${new Date(request.requested_at).toLocaleString()}${reviewed}</small>
+          ${request.admin_note ? `<small>Admin note: ${esc(request.admin_note)}</small>` : ''}
+        </div>
+        <div class="cashout-offer"><span class="status-chip ${request.status === 'approved' ? 'healthy' : request.status === 'rejected' ? 'danger' : 'warning'}">${esc(request.status)}</span></div>
       </div>`;
-    }).join('') : '<div class="panel-empty">No pending bets are eligible for cash-out.</div>';
-    list.querySelectorAll('[data-cashout]').forEach(button => {
-      button.addEventListener('click', async () => {
-        if (!window.confirm('Send this cash-out request for administrator approval?')) return;
-        button.disabled = true;
-        const { data: result, error: cashError } = await client().rpc('request_cash_out', { p_bet_id: button.dataset.cashout });
-        button.disabled = false;
-        if (cashError) return toast(cashError.message, true);
-        await loadCashOuts();
-        toast(`Cash-out request for ${money(result.cash_out)} is awaiting administrator approval.`);
-      });
-    });
+    }).join('') : '<div class="panel-empty">No withdrawal requests yet.</div>';
+  }
+
+  async function requestWithdrawal(event) {
+    event.preventDefault();
+    if (!sessionDetail.user) return window.openAceAuth(false);
+    const amount = Number(document.getElementById('withdrawalAmount').value);
+    if (!Number.isFinite(amount) || amount < 1) return toast('Enter a valid withdrawal amount.', true);
+    if (!window.confirm(`Request a withdrawal of ${money(amount)} from your available balance?`)) return;
+    const submit = event.submitter;
+    submit.disabled = true;
+    const { data: result, error } = await client().rpc('request_withdrawal', { p_amount: amount });
+    submit.disabled = false;
+    if (error) return toast(error.message, true);
+    document.getElementById('withdrawalAmount').value = '';
+    window.AceUI?.setBalance(result.balance);
+    window.AceUI?.updateBalanceDisplay();
+    await loadCashOuts();
+    toast(`Withdrawal request for ${money(result.amount)} is awaiting administrator approval.`);
   }
 
   async function mountPromotions() {
@@ -433,12 +465,10 @@
         <span> Awaiting a licensed live-data integration. No fabricated team or player statistics are displayed.</span></div>`;
     root.querySelectorAll('[data-match-selection]:not(.disabled)').forEach(button => {
       button.addEventListener('click', () => {
-        const state = window.AceUI.getState();
-        state.selections = [{
+        window.AceUI.addSelection({
           matchId: 9001, pick: button.dataset.pick, label: button.dataset.label,
           odds: Number(button.dataset.odds), selectionId: button.dataset.matchSelection
-        }];
-        window.AceUI.renderAllMarkets();
+        });
         toast(`${button.dataset.label} added to the bet slip.`);
       });
     });
@@ -459,7 +489,7 @@
     if (document.querySelector('[data-admin-tab="platform"]')) return;
     const tabs = workspace.querySelector('.admin-tabs');
     tabs.insertAdjacentHTML('beforeend', `
-      <button type="button" data-admin-tab="cashouts"><i class="fa-solid fa-money-bill-transfer"></i><span><b>Cash-outs</b><small>Approve requests</small></span></button>
+      <button type="button" data-admin-tab="cashouts"><i class="fa-solid fa-money-bill-transfer"></i><span><b>Withdrawals</b><small>Approve balance requests</small></span></button>
       <button type="button" data-admin-tab="risk"><i class="fa-solid fa-shield-halved"></i><span><b>Risk</b><small>Suspicious activity</small></span></button>
       <button type="button" data-admin-tab="support"><i class="fa-solid fa-headset"></i><span><b>Support</b><small>Tickets and replies</small></span></button>
       <button type="button" data-admin-tab="platform"><i class="fa-solid fa-toggle-on"></i><span><b>Platform</b><small>Features and maintenance</small></span></button>
@@ -489,17 +519,21 @@
 
   async function loadAdminCashouts() {
     const root = document.getElementById('adminCashoutsPanel');
-    root.innerHTML = '<div class="panel-empty">Loading cash-out requests…</div>';
-    const { data, error } = await client().from('cashout_requests')
-      .select('id,bet_id,user_id,offered_amount,status,requested_at').eq('status','pending')
-      .order('requested_at',{ascending:true});
+    root.innerHTML = '<div class="panel-empty">Loading withdrawal requests…</div>';
+    const { data, error } = await client().rpc('admin_list_withdrawals', { p_status: 'pending' });
     if (error) { root.innerHTML = `<div class="panel-empty">${esc(error.message)}</div>`; return; }
-    root.innerHTML = `<section class="feature-panel"><div class="feature-panel-head"><div><h2>Cash-out approvals</h2><p>Review pending player requests before any balance is credited.</p></div></div>
-      <div>${data?.length ? data.map(row => `<div class="cashout-row"><div><strong>${money(row.offered_amount)}</strong><small>Bet ${esc(row.bet_id)} · ${new Date(row.requested_at).toLocaleString()}</small></div><div class="cashout-offer"><button class="feature-action" data-review="${row.id}" data-approve="true">Approve</button><button class="feature-action danger" data-review="${row.id}" data-approve="false">Reject</button></div></div>`).join('') : '<div class="panel-empty">No pending cash-out requests.</div>'}</div></section>`;
+    root.innerHTML = `<section class="feature-panel"><div class="feature-panel-head"><div><h2>Withdrawal approvals</h2><p>Review funds already reserved from each player's available balance. Rejecting restores them automatically.</p></div></div>
+      <div>${data?.length ? data.map(row => `<div class="cashout-row"><div><strong>${money(row.amount)}</strong><small>${esc(row.display_name)} · ${esc(row.email)} · ${new Date(row.requested_at).toLocaleString()}</small></div><div class="cashout-offer"><button class="feature-action" data-review="${row.id}" data-approve="true">Approve</button><button class="feature-action danger" data-review="${row.id}" data-approve="false">Reject</button></div></div>`).join('') : '<div class="panel-empty">No pending withdrawal requests.</div>'}</div></section>`;
     root.querySelectorAll('[data-review]').forEach(button => button.addEventListener('click', async () => {
+      const approved = button.dataset.approve === 'true';
+      if (!window.confirm(`${approved ? 'Approve' : 'Reject'} this withdrawal request?`)) return;
       button.disabled = true;
-      const { error: reviewError } = await client().rpc('review_cash_out',{p_request_id:button.dataset.review,p_approve:button.dataset.approve==='true'});
-      if (reviewError) toast(reviewError.message,true); else { toast('Cash-out request reviewed.'); await loadAdminCashouts(); }
+      const { error: reviewError } = await client().rpc('review_withdrawal',{
+        p_request_id:button.dataset.review,
+        p_approve:approved,
+        p_note:null
+      });
+      if (reviewError) toast(reviewError.message,true); else { toast(`Withdrawal ${approved ? 'approved' : 'rejected'}.`); await loadAdminCashouts(); }
     }));
   }
 

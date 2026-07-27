@@ -79,8 +79,8 @@ const promotions = [
 const faqData = [
   { q:"How do I read decimal odds?", a:"Decimal odds show your total return per ₹1 staked, including your original stake. Odds of 2.10 mean a ₹10 bet returns ₹21.00 total if it wins." },
   { q:"How does a parlay payout work?", a:"A parlay multiplies the decimal odds of every leg together into one combined price. All legs must win for the parlay to pay out." },
-  { q:"Can I deposit or withdraw money?", a:"Not in this build. Ace Staker currently uses demo credits only. A licensed payment provider and verified operating setup are required before real-money payments can be added." },
-  { q:"Can I cash out a live bet early?", a:"Not yet. Cash-out pricing and settlement require a real odds/provider integration and are intentionally disabled in this demo." },
+  { q:"Are balance withdrawals paid as real money?", a:"Not in this demo build. Withdrawal requests reserve demo credits and require administrator review, but no bank or payment-provider transfer is connected." },
+  { q:"How do balance withdrawals work?", a:"Choose Withdraw Balance, enter an amount from your available balance, and submit it for administrator review. The requested amount is reserved immediately and restored automatically if the request is rejected." },
   { q:"What is Ace Staker's approach to responsible gambling?", a:"The demo provides daily stake limits, self-exclusion, and session reminders. These controls remain important even before real-money features are considered." },
 ];
 
@@ -171,8 +171,8 @@ function renderTicker(extraItems){
     <span class="ticker-item win-item"><i class="fa-solid fa-trophy"></i> ${w}</span>
   `);
   const items = scoreItems.concat(winItems).join('');
-  // Duplicate track content so the CSS -50% translate loop is seamless
-  track.innerHTML = items + items;
+  // Two equal groups make the -50% loop seamless at every viewport width.
+  track.innerHTML = `<span class="ticker-group">${items}</span><span class="ticker-group" aria-hidden="true">${items}</span>`;
 }
 let tickerWinCache = [
   "Alex_K won ₹2,140 on a 4-leg parlay",
@@ -280,6 +280,9 @@ function addSelection(sel){
   }
   renderSlip();
   renderMatches(); // refresh highlighted odds buttons
+  if(window.matchMedia('(max-width: 1080px)').matches){
+    document.getElementById('betslip')?.classList.add('open');
+  }
 }
 
 function removeSelection(matchId){
@@ -307,25 +310,25 @@ function getComboBoostPct(legCount){
 function renderSlip(){
   const body = document.getElementById('slipBody');
   if(!body) return; // the Home page has no bet slip aside
-  const empty = document.getElementById('slipEmptyState');
   const stakeSection = document.getElementById('stakeSection');
   const slipCount = document.getElementById('slipCount');
   const badge = document.getElementById('slipCountBadge');
+  if(!stakeSection || !slipCount || !badge) return;
 
   slipCount.textContent = state.selections.length ? `(${state.selections.length})` : '';
   badge.textContent = state.selections.length;
   badge.style.display = state.selections.length ? 'flex' : 'none';
 
   if(state.selections.length === 0){
-    empty.style.display = 'block';
     stakeSection.style.display = 'none';
-    // clear any per-item content
-    body.innerHTML = '';
-    body.appendChild(empty);
+    body.innerHTML = `
+      <div class="slip-empty" id="slipEmptyState">
+        <i class="fa-solid fa-receipt"></i>
+        Tap any odds to add your selection
+      </div>`;
     return;
   }
 
-  empty.style.display = 'none';
   stakeSection.style.display = 'block';
 
   // In "single" mode each selection gets its own stake input.
@@ -1002,11 +1005,13 @@ function renderFAQ(){
 // Avatar dropdown
 const avatarBtn = document.getElementById('avatarBtn');
 const userDropdown = document.getElementById('userDropdown');
-avatarBtn.addEventListener('click', (e)=>{
-  e.stopPropagation();
-  userDropdown.classList.toggle('open');
-});
-document.addEventListener('click', ()=> userDropdown.classList.remove('open'));
+if(avatarBtn && userDropdown){
+  avatarBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    userDropdown.classList.toggle('open');
+  });
+  document.addEventListener('click', ()=> userDropdown.classList.remove('open'));
+}
 
 document.body.classList.remove('light-mode');
 
@@ -1014,17 +1019,19 @@ document.body.classList.remove('light-mode');
 const historyModal = document.getElementById('historyModal');
 function openProfileModal(e){
   if(e) e.preventDefault();
-  userDropdown.classList.remove('open');
-  historyModal.classList.add('open');
+  userDropdown?.classList.remove('open');
+  historyModal?.classList.add('open');
 }
-document.getElementById('historyBtn').addEventListener('click', openProfileModal);
-document.getElementById('profileBtn').addEventListener('click', openProfileModal);
+document.getElementById('historyBtn')?.addEventListener('click', openProfileModal);
+document.getElementById('profileBtn')?.addEventListener('click', openProfileModal);
 document.getElementById('balancePill')?.addEventListener('click', openProfileModal);
-document.getElementById('closeModal').addEventListener('click', ()=> historyModal.classList.remove('open'));
-historyModal.addEventListener('click', (e)=>{ if(e.target === historyModal) historyModal.classList.remove('open'); });
+document.getElementById('closeModal')?.addEventListener('click', ()=> historyModal?.classList.remove('open'));
+historyModal?.addEventListener('click', (e)=>{ if(e.target === historyModal) historyModal.classList.remove('open'); });
 
 function renderHistory(){
-  document.getElementById('historyTableBody').innerHTML = historyData.map(h=>`
+  const historyTableBody = document.getElementById('historyTableBody');
+  if(!historyTableBody) return;
+  historyTableBody.innerHTML = historyData.map(h=>`
     <tr>
       <td>${h.date}</td>
       <td>${h.event}</td>
@@ -1199,6 +1206,7 @@ function renderHomeScoreboard(){
 window.AceUI = {
   getState: () => state,
   getMatches: () => matches,
+  addSelection,
   replaceMarkets(nextMatches, nextSports){
     const previous = new Map(matches.filter(match => match.eventId).map(match => [match.eventId, match]));
     nextMatches.forEach(match => {

@@ -479,20 +479,25 @@ body::after{
   overflow:hidden; white-space:nowrap; border-bottom:1px solid var(--glass-border);
 }
 .ticker{
-  display:inline-flex; gap:40px; padding:8px 0;
+  display:flex; width:max-content; padding:8px 0;
   animation:scrollTicker 34s linear infinite;
+  will-change:transform;
 }
+.ticker-group{ display:flex; flex:none; align-items:center; gap:40px; padding-right:40px; }
 .ticker-wrap:hover .ticker{ animation-play-state:paused; }
 @keyframes scrollTicker{
   0%{ transform:translateX(0); }
   100%{ transform:translateX(-50%); }
 }
-.ticker-item{ font-size:.82rem; font-weight:600; display:flex; align-items:center; gap:8px; }
+.ticker-item{ font-size:.82rem; font-weight:600; display:flex; flex:none; align-items:center; gap:8px; white-space:nowrap; }
 .ticker-item.win-item{ color:var(--gold-bright); }
 .ticker-item .live-dot{
   width:7px; height:7px; border-radius:50%; background:#fff; animation:pulseDot 1.2s infinite;
 }
 @keyframes pulseDot{ 0%,100%{ opacity:1;} 50%{ opacity:.3; } }
+@media (prefers-reduced-motion:reduce){
+  .ticker{ animation-play-state:paused; }
+}
 
 /* =========================================================
    4. LAYOUT — main grid: content + persistent bet slip sidebar

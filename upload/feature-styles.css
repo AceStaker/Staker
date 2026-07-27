@@ -145,6 +145,19 @@
 .cashout-row small,.ticket-row small,.risk-row small,.health-row small { display: block; margin-top: 4px; color: var(--text-dim); }
 .cashout-offer { text-align: right; }
 .cashout-offer b { display: block; color: #4ade80; margin-bottom: 6px; }
+.withdrawal-form { grid-template-columns: minmax(0,1fr) auto; align-items: end; margin-bottom: 12px; }
+.withdrawal-balance {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 14px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255,255,255,.035);
+}
+.withdrawal-balance strong { color: var(--gold-bright); }
+.withdrawal-history-title { margin: 20px 0 8px; }
 
 .tier-chip,.status-chip,.priority-chip {
   display: inline-flex;
@@ -257,6 +270,7 @@
   .feature-panel-head { align-items: flex-start; flex-direction: column; }
   .cashout-row,.ticket-row,.risk-row,.health-row,.control-row { grid-template-columns: 1fr; }
   .cashout-offer { text-align: left; }
+  .withdrawal-form { grid-template-columns: 1fr; }
   .match-stat-strip { grid-template-columns: repeat(2,1fr); }
   .match-hero-teams { gap: 8px; }
   .maintenance-card { padding: 30px 22px; }

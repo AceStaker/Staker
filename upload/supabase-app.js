@@ -77,9 +77,9 @@
             <span>Available demo credits</span>
             <strong id="walletPanelBalance">₹0.00</strong>
           </div>
-          <p class="panel-note">Payments are not connected. This wallet cannot receive deposits or make withdrawals.</p>
+          <p class="panel-note">Withdrawal requests require administrator approval. No bank or payment-provider transfer is connected in this demo.</p>
           <button class="feature-action wallet-cashout-cta" type="button" id="walletCashOutBtn">
-            <i class="fa-solid fa-money-bill-transfer"></i> Cash Out Eligible Bet
+            <i class="fa-solid fa-money-bill-transfer"></i> Withdraw from Balance
           </button>
           <h3>Recent activity</h3>
           <div id="walletActivity" class="activity-list"><div class="panel-empty">Sign in to view activity.</div></div>
@@ -467,7 +467,7 @@
       cashOut.dataset.signedInOnly = 'true';
       cashOut.dataset.mobileAccount = 'true';
       cashOut.dataset.cashoutAction = 'true';
-      cashOut.innerHTML = '<i class="fa-solid fa-money-bill-transfer"></i> Cash Out';
+      cashOut.innerHTML = '<i class="fa-solid fa-money-bill-transfer"></i> Withdraw Balance';
       cashOut.addEventListener('click', event => {
         event.preventDefault();
         window.AceCashOut?.open();
@@ -1347,7 +1347,7 @@
     client.auth.onAuthStateChange((_event, nextSession) => {
       setTimeout(() => applySession(nextSession), 0);
     });
-    if (!operationsPage) {
+    if (!operationsPage && !document.getElementById('matchDetailRoot')) {
       await loadMarkets();
       startPublicMarketsRefresh();
     }
