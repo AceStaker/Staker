@@ -480,14 +480,14 @@ body::after{
 }
 .ticker{
   display:flex; width:max-content; padding:8px 0;
-  animation:scrollTicker 34s linear infinite;
+  animation:scrollTicker var(--ticker-duration,60s) linear infinite;
   will-change:transform;
 }
 .ticker-group{ display:flex; flex:none; align-items:center; gap:40px; padding-right:40px; }
 .ticker-wrap:hover .ticker{ animation-play-state:paused; }
 @keyframes scrollTicker{
-  0%{ transform:translateX(0); }
-  100%{ transform:translateX(-50%); }
+  0%{ transform:translate3d(0,0,0); }
+  100%{ transform:translate3d(-50%,0,0); }
 }
 .ticker-item{ font-size:.82rem; font-weight:600; display:flex; flex:none; align-items:center; gap:8px; white-space:nowrap; }
 .ticker-item.win-item{ color:var(--gold-bright); }

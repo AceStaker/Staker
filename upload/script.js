@@ -158,10 +158,18 @@ function renderSportTabs(){
 }
 
 /* ---------- 3b. RENDER: TICKER ---------- */
+let tickerSignature = '';
 function renderTicker(extraItems){
   const track = document.getElementById('tickerTrack');
   if(!track) return;
-  const scoreItems = matches.map(m => `
+  const isHomePage = /Ace Staker \| Home/i.test(document.title);
+  const tickerMatches = isHomePage
+    ? [
+        ...matches.filter(match => match.status === 'Live'),
+        ...matches.filter(match => match.status !== 'Live')
+      ].slice(0, 12)
+    : matches;
+  const scoreItems = tickerMatches.map(m => `
     <span class="ticker-item" data-ticker-id="${m.id}">
       ${m.status === 'Live' ? '<span class="live-dot"></span>' : ''}
       <b>${m.team1} ${m.live_score} ${m.team2}</b> · ${m.league}
@@ -171,8 +179,13 @@ function renderTicker(extraItems){
     <span class="ticker-item win-item"><i class="fa-solid fa-trophy"></i> ${w}</span>
   `);
   const items = scoreItems.concat(winItems).join('');
+  const signature = `${isHomePage ? 'home' : 'full'}:${items}`;
+  if(signature === tickerSignature && track.querySelectorAll('.ticker-group').length === 2) return;
+  tickerSignature = signature;
   // Two equal groups make the -50% loop seamless at every viewport width.
   track.innerHTML = `<span class="ticker-group">${items}</span><span class="ticker-group" aria-hidden="true">${items}</span>`;
+  const groupWidth = track.querySelector('.ticker-group')?.scrollWidth || 0;
+  track.style.setProperty('--ticker-duration', `${Math.max(36, groupWidth / 80).toFixed(2)}s`);
 }
 let tickerWinCache = [
   "Alex_K won ₹2,140 on a 4-leg parlay",
