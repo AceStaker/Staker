@@ -893,14 +893,45 @@
   .stage-metrics{ left:10px; right:10px; bottom:10px; gap:5px; }
   .stage-metrics>div{ flex:1; justify-content:center; padding:8px 5px; font-size:.58rem; }
   .stage-metrics>div i{ display:none; }
-  .flight-console{ display:flex; flex-direction:column; padding:17px; border-radius:14px; }
-  .console-head{ margin-bottom:16px; }
-  .stake-control{ height:58px; }
-  .stake-control input{ font-size:1.65rem; }
-  .stake-chips{ margin-bottom:10px; }
-  .flight-action{ order:1; min-height:68px; border-radius:13px; }
-  .potential-row{ order:2; margin:14px 0 8px; }
-  .console-note{ order:3; margin-top:4px; }
+  .flight-console{
+    display:grid;
+    grid-template-columns:minmax(0,.84fr) minmax(0,1.16fr);
+    grid-template-areas:
+      "head head"
+      "ticket ticket"
+      "label label"
+      "stake action"
+      "chips action"
+      "potential potential"
+      "note note";
+    gap:8px 10px;
+    padding:15px;
+    border-radius:14px;
+  }
+  .console-head{ grid-area:head; margin-bottom:3px; }
+  .console-head>i{ width:38px; height:38px; }
+  .active-ticket{ grid-area:ticket; margin:0 0 3px; }
+  .control-label{ grid-area:label; margin:0; }
+  .stake-control{ grid-area:stake; height:58px; }
+  .stake-control span{ padding-left:12px; font-size:1.3rem; }
+  .stake-control input{ padding-right:8px; font-size:1.45rem; }
+  .stake-chips{ grid-area:chips; grid-template-columns:repeat(2,1fr); gap:6px; margin:0; }
+  .stake-chips button{ min-height:32px; }
+  .flight-action{
+    grid-area:action;
+    min-height:128px;
+    height:100%;
+    flex-direction:column;
+    gap:8px;
+    padding:13px 10px;
+    border-radius:14px;
+  }
+  .flight-action .action-icon{ display:none; }
+  .flight-action>span:last-child{ text-align:center; }
+  .flight-action small{ font-size:.55rem; }
+  .flight-action b{ font-size:1.25rem; line-height:1.15; }
+  .potential-row{ grid-area:potential; margin:8px 2px 0; padding-top:10px; border-top:1px solid rgba(255,255,255,.065); }
+  .console-note{ grid-area:note; margin-top:0; }
   .fairness-card,.my-flights-card{ min-height:0; padding:17px; border-radius:14px; }
   .aviator-rules{ grid-template-columns:1fr; }
   .aviator-rules>a{ justify-content:center; }
