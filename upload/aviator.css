@@ -893,12 +893,14 @@
   .stage-metrics{ left:10px; right:10px; bottom:10px; gap:5px; }
   .stage-metrics>div{ flex:1; justify-content:center; padding:8px 5px; font-size:.58rem; }
   .stage-metrics>div i{ display:none; }
-  .flight-console{ padding:17px; border-radius:14px; }
+  .flight-console{ display:flex; flex-direction:column; padding:17px; border-radius:14px; }
   .console-head{ margin-bottom:16px; }
   .stake-control{ height:58px; }
   .stake-control input{ font-size:1.65rem; }
-  .potential-row{ margin-top:15px; }
-  .flight-action{ min-height:68px; border-radius:13px; }
+  .stake-chips{ margin-bottom:10px; }
+  .flight-action{ order:1; min-height:68px; border-radius:13px; }
+  .potential-row{ order:2; margin:14px 0 8px; }
+  .console-note{ order:3; margin-top:4px; }
   .fairness-card,.my-flights-card{ min-height:0; padding:17px; border-radius:14px; }
   .aviator-rules{ grid-template-columns:1fr; }
   .aviator-rules>a{ justify-content:center; }
