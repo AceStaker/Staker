@@ -786,6 +786,8 @@ body::after{
   border-radius:var(--radius); padding:18px 20px;
   transition:border-color .2s, transform .2s;
 }
+.match-card[data-match-href]{ cursor:pointer; }
+.match-card[data-match-href]:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
 .match-card:hover{ border-color:var(--gold); transform:translateY(-2px); }
 .match-card-top{ display:grid; grid-template-columns:1fr auto; gap:16px; align-items:center; }
 

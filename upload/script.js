@@ -206,6 +206,7 @@ function renderMatches(){
 
   list.innerHTML = filtered.map(m => {
     const isSelected = (pick) => state.selections.some(s => s.matchId === m.id && s.pick === pick);
+    const matchHref = m.eventId ? `match.html?event=${encodeURIComponent(m.eventId)}` : '';
     const oddsBtn = (pick, label, value) => {
       if(value === null || value === undefined){
         return `<div class="odds-btn disabled"><span class="odds-label">${label}</span><span class="odds-val">—</span></div>`;
@@ -219,7 +220,7 @@ function renderMatches(){
     // "Hot" badge — cosmetic gaming touch flagging matches with lopsided crowd trends
     const isHot = m.trend.home >= 70 || m.trend.away >= 70;
     return `
-    <div class="match-card glass">
+    <div class="match-card glass" ${matchHref ? `data-match-href="${matchHref}" role="link" tabindex="0" aria-label="View ${m.team1} versus ${m.team2} match details"` : ''}>
       <div class="match-card-top">
         <div>
           <div class="match-meta">
@@ -252,15 +253,13 @@ function renderMatches(){
           <div class="trend-seg-away" style="width:${m.trend.away}%"></div>
         </div>
       </div>
-      ${m.eventId ? `<a class="match-detail-link" href="match.html?event=${encodeURIComponent(m.eventId)}">
-        View all markets &amp; match details <i class="fa-solid fa-arrow-right"></i>
-      </a>` : ''}
     </div>`;
   }).join('');
 
   // Wire up click-to-add-to-slip on every enabled odds button
   list.querySelectorAll('.odds-btn:not(.disabled)').forEach(btn=>{
-    btn.addEventListener('click', ()=>{
+    btn.addEventListener('click', event=>{
+      event.stopPropagation();
       addSelection({
         matchId: Number(btn.dataset.match),
         pick: btn.dataset.pick,
@@ -268,6 +267,18 @@ function renderMatches(){
         odds: Number(btn.dataset.odds),
         selectionId: btn.dataset.selection || null,
       });
+    });
+  });
+  list.querySelectorAll('[data-match-href]').forEach(card => {
+    const openMatch = () => { window.location.href = card.dataset.matchHref; };
+    card.addEventListener('click', event => {
+      if(event.target.closest('button.odds-btn')) return;
+      openMatch();
+    });
+    card.addEventListener('keydown', event => {
+      if(event.target !== card || (event.key !== 'Enter' && event.key !== ' ')) return;
+      event.preventDefault();
+      openMatch();
     });
   });
 }
