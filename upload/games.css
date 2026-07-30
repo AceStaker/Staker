@@ -283,6 +283,8 @@
 .range-readout{ display:flex; align-items:center; justify-content:space-between; color:#7b7582; font-size:.67rem; }
 .range-readout strong{ color:#fff; font:800 1rem "Rajdhani",sans-serif; }
 .instant-stake{ display:grid; grid-template-columns:38px auto 1fr 38px; align-items:center; height:64px; border:1px solid rgba(255,255,255,.09); border-radius:14px; background:rgba(255,255,255,.04); }
+.control-label{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
+.control-label span:last-child{ color:#6f6976; font-size:.62rem; }
 .instant-stake>button{ width:30px; height:30px; margin:auto; border:0; border-radius:50%; color:#aaa5af; background:rgba(255,255,255,.07); cursor:pointer; }
 .instant-stake>span{ color:var(--game-accent); font:800 1.45rem "Rajdhani",sans-serif; }
 .instant-stake input{ width:100%; height:100%; border:0; outline:0; padding:0 8px; background:transparent; color:#fff; font:800 1.8rem "Rajdhani",sans-serif; }
@@ -290,6 +292,7 @@
 .instant-chips button{ min-height:34px; border:1px solid rgba(255,255,255,.07); border-radius:9px; background:rgba(255,255,255,.035); color:#8f8995; font:700 .68rem "Inter",sans-serif; cursor:pointer; }
 .instant-chips button:hover{ color:#fff; border-color:color-mix(in srgb,var(--game-accent) 35%,transparent); }
 .session-meter{ display:grid; grid-template-columns:1fr 1fr; gap:7px; margin:0 0 12px; }
+.session-meter[hidden],.cashout-action[hidden]{ display:none; }
 .session-meter>div{ display:grid; gap:3px; padding:11px; border:1px solid rgba(255,255,255,.065); border-radius:10px; background:rgba(255,255,255,.025); }
 .session-meter span{ color:#6c6673; font-size:.58rem; }.session-meter strong{ color:var(--game-accent); font:800 1.05rem "Rajdhani",sans-serif; }
 .instant-action,.cashout-action{
