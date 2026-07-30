@@ -129,50 +129,84 @@
       <div class="console-head">
         <div>
           <span>FLIGHT CONTROL</span>
-          <h2>Place your demo stake</h2>
+          <h2>Choose either bet—or board with both</h2>
         </div>
         <i class="fa-solid fa-sliders"></i>
       </div>
 
-      <div class="active-ticket" id="activeTicket" hidden>
-        <div>
-          <span>YOUR TICKET</span>
-          <strong id="ticketStake">₹0.00</strong>
-        </div>
-      </div>
+      <div class="bet-options">
+        <section class="bet-option" data-bet-slot="1">
+          <div class="bet-option-head">
+            <span>BET 1</span>
+            <strong>Primary</strong>
+          </div>
+          <div class="active-ticket" data-role="active-ticket" hidden>
+            <div><span>YOUR TICKET</span><strong data-role="ticket-stake">₹0.00</strong></div>
+          </div>
+          <label class="control-label" for="aviatorStake1">
+            <span>Stake amount</span><span>Demo credits</span>
+          </label>
+          <div class="bet-option-grid">
+            <div class="bet-inputs">
+              <div class="stake-control">
+                <span>₹</span>
+                <input id="aviatorStake1" data-role="stake" type="number" min="10" max="100000" step="10" value="100" inputmode="decimal">
+              </div>
+              <div class="stake-chips" data-role="stake-chips">
+                <button type="button" data-stake="100">₹100</button>
+                <button type="button" data-stake="500">₹500</button>
+                <button type="button" data-stake="1000">₹1K</button>
+                <button type="button" data-stake="5000">₹5K</button>
+              </div>
+            </div>
+            <button class="flight-action board" data-role="flight-action" type="button">
+              <span class="action-icon"><i class="fa-solid fa-plane-departure"></i></span>
+              <span><small data-role="action-eyebrow">NEXT FLIGHT</small><b data-role="action-label">BOARD FOR ₹100.00</b></span>
+            </button>
+          </div>
+          <div class="potential-row">
+            <span>At <b data-role="potential-multiplier">2.00×</b></span>
+            <strong data-role="potential-return">₹200.00</strong>
+          </div>
+          <p class="console-note" data-role="console-note"><i class="fa-solid fa-circle-info"></i> Sign in to place a demo-credit wager.</p>
+        </section>
 
-      <label class="control-label" for="aviatorStake">
-        <span>Stake amount</span>
-        <span>Demo credits</span>
-      </label>
-      <div class="stake-control">
-        <span>₹</span>
-        <input id="aviatorStake" type="number" min="10" max="100000" step="10" value="100" inputmode="decimal">
+        <section class="bet-option" data-bet-slot="2">
+          <div class="bet-option-head">
+            <span>BET 2</span>
+            <strong>Second chance</strong>
+          </div>
+          <div class="active-ticket" data-role="active-ticket" hidden>
+            <div><span>YOUR TICKET</span><strong data-role="ticket-stake">₹0.00</strong></div>
+          </div>
+          <label class="control-label" for="aviatorStake2">
+            <span>Stake amount</span><span>Demo credits</span>
+          </label>
+          <div class="bet-option-grid">
+            <div class="bet-inputs">
+              <div class="stake-control">
+                <span>₹</span>
+                <input id="aviatorStake2" data-role="stake" type="number" min="10" max="100000" step="10" value="100" inputmode="decimal">
+              </div>
+              <div class="stake-chips" data-role="stake-chips">
+                <button type="button" data-stake="100">₹100</button>
+                <button type="button" data-stake="500">₹500</button>
+                <button type="button" data-stake="1000">₹1K</button>
+                <button type="button" data-stake="5000">₹5K</button>
+              </div>
+            </div>
+            <button class="flight-action board" data-role="flight-action" type="button">
+              <span class="action-icon"><i class="fa-solid fa-plane-departure"></i></span>
+              <span><small data-role="action-eyebrow">NEXT FLIGHT</small><b data-role="action-label">BOARD FOR ₹100.00</b></span>
+            </button>
+          </div>
+          <div class="potential-row">
+            <span>At <b data-role="potential-multiplier">2.00×</b></span>
+            <strong data-role="potential-return">₹200.00</strong>
+          </div>
+          <p class="console-note" data-role="console-note"><i class="fa-solid fa-circle-info"></i> Sign in to place a demo-credit wager.</p>
+        </section>
       </div>
-      <div class="stake-chips" id="stakeChips">
-        <button type="button" data-stake="100">₹100</button>
-        <button type="button" data-stake="500">₹500</button>
-        <button type="button" data-stake="1000">₹1K</button>
-        <button type="button" data-stake="5000">₹5K</button>
-      </div>
-
-      <div class="potential-row">
-        <span>Example return at <b id="potentialMultiplier">2.00×</b></span>
-        <strong id="potentialReturn">₹200.00</strong>
-      </div>
-
-      <button class="flight-action board" id="flightAction" type="button">
-        <span class="action-icon"><i class="fa-solid fa-plane-departure"></i></span>
-        <span>
-          <small id="actionEyebrow">NEXT FLIGHT</small>
-          <b id="actionLabel">BOARD FOR ₹100.00</b>
-        </span>
-      </button>
-
-      <p class="console-note" id="consoleNote">
-        <i class="fa-solid fa-circle-info"></i>
-        Sign in to place a demo-credit wager. No real money or prizes.
-      </p>
     </aside>
   </div>
 

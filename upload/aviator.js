@@ -9,13 +9,14 @@
   })}`;
 
   const els = {};
+  const betControls = [];
   let backend;
   let snapshot;
   let serverOffset = 0;
   let pollTimer;
   let frameId;
   let requestPending = false;
-  let actionPending = false;
+  const pendingSlots = new Set();
   let previousStatus = '';
   let previousRoundId = '';
   let impactRoundId = '';
@@ -26,11 +27,25 @@
     [
       'flightStage', 'flightCanvas', 'planeWrap', 'roundCode', 'roundStatus',
       'countdownValue', 'multiplierValue', 'flightMessage', 'playerCount',
-      'roundPool', 'roundHistory', 'flightAction', 'actionEyebrow',
-      'actionLabel', 'consoleNote', 'aviatorStake', 'stakeChips',
-      'potentialMultiplier', 'potentialReturn', 'activeTicket', 'ticketStake',
-      'myFlights', 'flightLogStatus', 'soundToggle'
+      'roundPool', 'roundHistory', 'myFlights', 'flightLogStatus', 'soundToggle'
     ].forEach(id => { els[id] = document.getElementById(id); });
+
+    document.querySelectorAll('[data-bet-slot]').forEach(element => {
+      const role = name => element.querySelector(`[data-role="${name}"]`);
+      betControls.push({
+        slot: Number(element.dataset.betSlot),
+        activeTicket: role('active-ticket'),
+        ticketStake: role('ticket-stake'),
+        stake: role('stake'),
+        stakeChips: role('stake-chips'),
+        action: role('flight-action'),
+        actionEyebrow: role('action-eyebrow'),
+        actionLabel: role('action-label'),
+        potentialMultiplier: role('potential-multiplier'),
+        potentialReturn: role('potential-return'),
+        note: role('console-note')
+      });
+    });
   }
 
   function user() {
@@ -92,7 +107,9 @@
       els.roundStatus.className = 'round-status crashed';
       els.roundStatus.innerHTML = '<i class="fa-solid fa-circle"></i> Reconnecting';
       els.flightMessage.textContent = 'Restoring the live flight connection';
-      els.consoleNote.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${error.message}`;
+      betControls.forEach(control => {
+        control.note.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${error.message}`;
+      });
     } finally {
       requestPending = false;
     }
@@ -113,7 +130,7 @@
 
     renderRoundHistory(snapshot.history || []);
     renderMyFlights(snapshot.my_history || []);
-    renderTicket(snapshot.my_bet);
+    betControls.forEach(control => renderTicket(control, betForSlot(control.slot)));
 
     if (round.status === 'crashed' && impactRoundId !== round.id) {
       impactRoundId = round.id;
@@ -144,10 +161,19 @@
     }).join('');
   }
 
-  function renderTicket(bet) {
-    els.activeTicket.hidden = !bet;
+  function currentBets() {
+    if (Array.isArray(snapshot?.my_bets)) return snapshot.my_bets;
+    return snapshot?.my_bet ? [snapshot.my_bet] : [];
+  }
+
+  function betForSlot(slot) {
+    return currentBets().find(bet => Number(bet.bet_slot || 1) === slot);
+  }
+
+  function renderTicket(control, bet) {
+    control.activeTicket.hidden = !bet;
     if (!bet) return;
-    els.ticketStake.textContent = money(bet.stake);
+    control.ticketStake.textContent = money(bet.stake);
   }
 
   function renderMyFlights(history) {
@@ -170,7 +196,7 @@
         : pending ? 'IN FLIGHT' : 'FLEW AWAY';
       return `
         <div class="my-flight-row">
-          <div><span>STAKE</span><b>${money(item.stake)}</b></div>
+          <div><span>BET ${Number(item.bet_slot || 1)} · STAKE</span><b>${money(item.stake)}</b></div>
           <div><span>CRASH</span><b>${item.crash_multiplier ? `${Number(item.crash_multiplier).toFixed(2)}×` : '—'}</b></div>
           <div class="flight-result ${outcomeClass}"><span>${won ? 'PAYOUT' : 'RESULT'}</span><b>${won ? money(item.payout) : outcome}</b></div>
         </div>`;
@@ -180,78 +206,69 @@
   function renderControls() {
     const round = snapshot?.round;
     if (!round) return;
-    const bet = snapshot.my_bet;
     const signedIn = Boolean(user());
     const waiting = round.status === 'waiting';
     const flying = round.status === 'flying';
-    const activeBet = bet?.status === 'pending';
-    const stake = validStake();
+    betControls.forEach(control => {
+      const bet = betForSlot(control.slot);
+      const activeBet = bet?.status === 'pending';
+      const stake = validStake(control);
+      const pending = pendingSlots.has(control.slot);
 
-    els.aviatorStake.disabled = !signedIn || Boolean(bet);
-    els.stakeChips.querySelectorAll('button').forEach(button => { button.disabled = !signedIn || Boolean(bet); });
+      control.stake.disabled = !signedIn || Boolean(bet);
+      control.stakeChips.querySelectorAll('button').forEach(button => {
+        button.disabled = !signedIn || Boolean(bet);
+      });
+      control.action.disabled = pending;
+      control.action.className = 'flight-action';
 
-    els.flightAction.disabled = actionPending;
-    els.flightAction.className = 'flight-action';
-
-    if (!signedIn) {
-      els.flightAction.classList.add('board');
-      els.actionEyebrow.textContent = 'ACCOUNT REQUIRED';
-      els.actionLabel.textContent = 'SIGN IN TO PLAY';
-      els.consoleNote.innerHTML = '<i class="fa-solid fa-lock"></i> The live flight remains visible. Sign in to unlock betting controls.';
-      return;
-    }
-
-    if (activeBet && flying) {
-      const multiplier = roundMultiplier(round);
-      const payout = Number(bet.stake) * multiplier;
-      if (multiplier < 1.10) {
-        els.flightAction.classList.add('waiting');
-        els.flightAction.disabled = true;
-        els.actionEyebrow.textContent = 'FLIGHT JUST STARTED';
-        els.actionLabel.textContent = 'CASH OUT OPENS AT 1.10×';
-        els.consoleNote.innerHTML = '<i class="fa-solid fa-gauge-high"></i> Manual cash-out unlocks when the live multiplier reaches 1.10×.';
-        return;
+      if (!signedIn) {
+        control.action.classList.add('board');
+        control.actionEyebrow.textContent = 'ACCOUNT REQUIRED';
+        control.actionLabel.textContent = 'SIGN IN TO PLAY';
+        control.note.innerHTML = '<i class="fa-solid fa-lock"></i> Sign in to unlock this betting option.';
+      } else if (activeBet && flying) {
+        const multiplier = roundMultiplier(round);
+        const payout = Number(bet.stake) * multiplier;
+        if (multiplier < 1.10) {
+          control.action.classList.add('waiting');
+          control.action.disabled = true;
+          control.actionEyebrow.textContent = 'FLIGHT JUST STARTED';
+          control.actionLabel.textContent = 'OPENS AT 1.10×';
+          control.note.innerHTML = '<i class="fa-solid fa-gauge-high"></i> Cash-out unlocks at 1.10×.';
+        } else {
+          control.action.classList.add('cashout');
+          control.actionEyebrow.textContent = `CASH OUT ${multiplier.toFixed(2)}×`;
+          control.actionLabel.textContent = `COLLECT ${money(payout)}`;
+          control.note.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Server-verified cash-out.';
+        }
+      } else if (activeBet && waiting) {
+        control.action.classList.add('waiting');
+        control.action.disabled = true;
+        control.actionEyebrow.textContent = 'TICKET CONFIRMED';
+        control.actionLabel.textContent = 'READY FOR TAKEOFF';
+        control.note.innerHTML = '<i class="fa-solid fa-circle-check"></i> This stake is locked for the flight.';
+      } else if (bet) {
+        control.action.classList.add('waiting');
+        control.action.disabled = true;
+        control.actionEyebrow.textContent = bet.status === 'cashed_out' ? 'FLIGHT COMPLETE' : 'ROUND COMPLETE';
+        control.actionLabel.textContent = bet.status === 'cashed_out'
+          ? `COLLECTED ${money(bet.payout)}`
+          : 'WAITING FOR NEXT FLIGHT';
+      } else if (waiting) {
+        control.action.classList.add('board');
+        control.action.disabled = pending || !stake;
+        control.actionEyebrow.textContent = `BET ${control.slot} · NEXT FLIGHT`;
+        control.actionLabel.textContent = stake ? `BOARD FOR ${money(stake)}` : 'ENTER A VALID STAKE';
+        control.note.innerHTML = '<i class="fa-solid fa-ticket"></i> One ticket in this slot per flight.';
+      } else {
+        control.action.classList.add('waiting');
+        control.action.disabled = true;
+        control.actionEyebrow.textContent = flying ? 'FLIGHT IN PROGRESS' : 'ROUND COMPLETE';
+        control.actionLabel.textContent = 'BOARDING CLOSED';
+        control.note.innerHTML = '<i class="fa-solid fa-clock"></i> Opens with the next flight.';
       }
-      els.flightAction.classList.add('cashout');
-      els.actionEyebrow.textContent = `CASH OUT AT ${multiplier.toFixed(2)}×`;
-      els.actionLabel.textContent = `COLLECT ${money(payout)}`;
-      els.consoleNote.innerHTML = '<i class="fa-solid fa-shield-halved"></i> Cash-out timing and payout are verified by the server.';
-      return;
-    }
-
-    if (activeBet && waiting) {
-      els.flightAction.classList.add('waiting');
-      els.flightAction.disabled = true;
-      els.actionEyebrow.textContent = 'TICKET CONFIRMED';
-      els.actionLabel.textContent = 'READY FOR TAKEOFF';
-      els.consoleNote.innerHTML = '<i class="fa-solid fa-circle-check"></i> Your stake is locked for this flight.';
-      return;
-    }
-
-    if (bet) {
-      els.flightAction.classList.add('waiting');
-      els.flightAction.disabled = true;
-      els.actionEyebrow.textContent = bet.status === 'cashed_out' ? 'FLIGHT COMPLETE' : 'ROUND COMPLETE';
-      els.actionLabel.textContent = bet.status === 'cashed_out'
-        ? `COLLECTED ${money(bet.payout)}`
-        : 'WAITING FOR NEXT FLIGHT';
-      return;
-    }
-
-    if (waiting) {
-      els.flightAction.classList.add('board');
-      els.flightAction.disabled = actionPending || !stake;
-      els.actionEyebrow.textContent = 'NEXT FLIGHT';
-      els.actionLabel.textContent = stake ? `BOARD FOR ${money(stake)}` : 'ENTER A VALID STAKE';
-      els.consoleNote.innerHTML = '<i class="fa-solid fa-lock"></i> One ticket per account per flight.';
-      return;
-    }
-
-    els.flightAction.classList.add('waiting');
-    els.flightAction.disabled = true;
-    els.actionEyebrow.textContent = flying ? 'FLIGHT IN PROGRESS' : 'ROUND COMPLETE';
-    els.actionLabel.textContent = 'BOARDING CLOSED';
-    els.consoleNote.innerHTML = '<i class="fa-solid fa-clock"></i> Boarding opens automatically for the next flight.';
+    });
   }
 
   function renderAnimation() {
@@ -275,11 +292,11 @@
         const multiplier = roundMultiplier({ ...round, status: 'flying' }, at);
         els.multiplierValue.innerHTML = `${multiplier.toFixed(2)}<span>×</span>`;
         els.roundStatus.innerHTML = '<i class="fa-solid fa-circle"></i> In flight';
-        els.flightMessage.textContent = snapshot.my_bet?.status === 'pending'
+        els.flightMessage.textContent = currentBets().some(bet => bet.status === 'pending')
           ? 'Cash out before the plane flies away'
           : 'The multiplier is climbing';
         updatePlane(at - startsAt);
-        if (snapshot.my_bet?.status === 'pending') renderControls();
+        if (currentBets().some(bet => bet.status === 'pending')) renderControls();
       } else {
         const crash = Number(round.crash_multiplier || round.multiplier || 1);
         els.multiplierValue.innerHTML = `${crash.toFixed(2)}<span>×</span>`;
@@ -370,21 +387,21 @@
     context.fill();
   }
 
-  function validStake() {
-    const value = Number(els.aviatorStake.value);
+  function validStake(control) {
+    const value = Number(control.stake.value);
     return Number.isFinite(value) && value >= 10 && value <= 100000 ? Math.round(value * 100) / 100 : 0;
   }
 
-  function updatePotential() {
-    const stake = validStake();
+  function updatePotential(control) {
+    const stake = validStake(control);
     const multiplier = 2;
-    els.potentialMultiplier.textContent = `${multiplier.toFixed(2)}×`;
-    els.potentialReturn.textContent = money(stake * multiplier);
+    control.potentialMultiplier.textContent = `${multiplier.toFixed(2)}×`;
+    control.potentialReturn.textContent = money(stake * multiplier);
     renderControls();
   }
 
-  async function handleAction() {
-    if (actionPending) return;
+  async function handleAction(control) {
+    if (pendingSlots.has(control.slot)) return;
     if (!user()) {
       window.openAceAuth?.(false);
       notify('Sign in to unlock Aviator betting.', true);
@@ -393,44 +410,49 @@
 
     const round = snapshot?.round;
     if (!round) return;
-    const bet = snapshot.my_bet;
-    actionPending = true;
+    const bet = betForSlot(control.slot);
+    pendingSlots.add(control.slot);
     renderControls();
 
     try {
       if (bet?.status === 'pending' && round.status === 'flying') {
-        const { data, error } = await backend.client.rpc('aviator_cash_out');
+        const { data, error } = await backend.client.rpc('aviator_cash_out_slot', {
+          p_slot: control.slot
+        });
         if (error) throw error;
         tone(920, .18, .055);
         notify(`Cashed out at ${Number(data.multiplier).toFixed(2)}× — ${money(data.payout)} credited.`);
       } else if (!bet && round.status === 'waiting') {
-        const stake = validStake();
+        const stake = validStake(control);
         if (!stake) throw new Error('Enter a stake between ₹10 and ₹1,00,000.');
-        const { error } = await backend.client.rpc('aviator_place_bet', {
+        const { error } = await backend.client.rpc('aviator_place_bet_slot', {
           p_stake: stake,
+          p_slot: control.slot,
           p_auto_cashout: null
         });
         if (error) throw error;
         tone(660, .12, .04);
-        notify('Ticket confirmed. Prepare for takeoff.');
+        notify(`Bet ${control.slot} confirmed. Prepare for takeoff.`);
       }
     } catch (error) {
       notify(error.message, true);
     } finally {
-      actionPending = false;
+      pendingSlots.delete(control.slot);
       await fetchState();
       renderControls();
     }
   }
 
   function bindEvents() {
-    els.flightAction.addEventListener('click', handleAction);
-    els.aviatorStake.addEventListener('input', updatePotential);
-    els.stakeChips.addEventListener('click', event => {
-      const button = event.target.closest('[data-stake]');
-      if (!button) return;
-      els.aviatorStake.value = button.dataset.stake;
-      updatePotential();
+    betControls.forEach(control => {
+      control.action.addEventListener('click', () => handleAction(control));
+      control.stake.addEventListener('input', () => updatePotential(control));
+      control.stakeChips.addEventListener('click', event => {
+        const button = event.target.closest('[data-stake]');
+        if (!button) return;
+        control.stake.value = button.dataset.stake;
+        updatePotential(control);
+      });
     });
     els.soundToggle.addEventListener('click', () => {
       soundEnabled = !soundEnabled;
@@ -458,7 +480,7 @@
     }
 
     bindEvents();
-    updatePotential();
+    betControls.forEach(updatePotential);
     await fetchState();
     pollTimer = window.setInterval(fetchState, POLL_MS);
     frameId = requestAnimationFrame(renderAnimation);
