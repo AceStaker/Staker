@@ -699,9 +699,9 @@ body::after{
 .home-aviator-atmosphere img{
   position:absolute;
   z-index:3;
-  width:clamp(330px,46vw,690px);
+  width:clamp(330px,42vw,650px);
   height:auto;
-  right:clamp(-115px,-5vw,-45px);
+  right:2%;
   top:50%;
   transform:translateY(-43%) rotate(-2deg);
   filter:drop-shadow(0 20px 28px rgba(0,0,0,.6)) drop-shadow(0 0 15px rgba(66,137,255,.2));
@@ -725,8 +725,8 @@ body::after{
   position:absolute;
   z-index:2;
   top:57%;
-  right:44%;
-  width:31%;
+  right:36%;
+  width:30%;
   height:8px;
   border-radius:999px;
   transform:rotate(-3deg);
@@ -1415,7 +1415,7 @@ table.history td{ padding:9px 8px; border-bottom:1px solid rgba(255,255,255,.05)
   }
   .home-aviator-banner{ min-height:300px; }
   .home-aviator-copy{ width:56%; }
-  .home-aviator-atmosphere img{ width:58vw; right:-15%; }
+  .home-aviator-atmosphere img{ width:55vw; right:0; }
   .home-action-grid{ grid-template-columns:1fr 1fr; }
   .home-action-card.sportsbook{ grid-column:1/-1; }
   .home-game-row{ grid-template-columns:repeat(2,minmax(0,1fr)); }
