@@ -55,6 +55,15 @@ if (!clientJs.includes("rpc('instant_game_action'")) {
 if (!clientJs.includes("rpc('instant_game_state'")) {
   errors.push('Round restore RPC is not wired');
 }
+if (!clientJs.includes('class="traffic-unit')) {
+  errors.push('Lucky Crossing live traffic is missing');
+}
+if (clientJs.includes('crossing-cinema')) {
+  errors.push('Lucky Crossing still includes the retired split-photo scene');
+}
+if (!gamesCss.includes('Instant games viewport repair')) {
+  errors.push('Responsive instant-game viewport guard is missing');
+}
 
 if (errors.length) {
   console.error(errors.join('\n'));

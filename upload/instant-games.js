@@ -220,8 +220,6 @@
       </div>`;
     }).join('');
     return `<div class="crossing-scene" style="--crossing-progress:${visibleStep}">
-      <div class="crossing-cinema"></div>
-      <div class="crossing-city-glow"></div>
       <div class="crossing-road">${traffic}</div>
       <div class="crossing-hud"><span>RUN <b>#${progress + 1}</b></span><span>${state.options.crossing.difficulty.toUpperCase()} TRAFFIC</span></div>
       <div class="crossing-route">${Array.from({ length: 7 }, (_, index) => `<span class="${index < visibleStep ? 'cleared' : index === visibleStep ? 'current' : ''}"></span>`).join('')}</div>

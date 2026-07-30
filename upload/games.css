@@ -1112,3 +1112,376 @@
   .vehicle-wheel{ width:12px; height:12px; bottom:-7px; }
   .crossing-player{ width:72px; bottom:calc(2% + var(--crossing-progress) * 9.2%); }
 }
+
+/* Instant games viewport repair — one coherent, fully visible system */
+.instant-main{
+  padding-top:20px;
+}
+.back-to-games{
+  margin-bottom:10px;
+}
+.instant-title{
+  margin-bottom:14px;
+}
+.instant-title h1{
+  font-size:clamp(2.45rem,4.2vw,3.8rem);
+}
+.instant-title p{
+  margin-top:4px;
+}
+.instant-layout{
+  grid-template-columns:minmax(0,1fr) minmax(320px,370px);
+  align-items:stretch;
+}
+.game-stage,
+.game-console{
+  min-height:0;
+  height:clamp(440px,calc(100dvh - 240px),540px);
+}
+.game-scene{
+  overflow:hidden;
+  border-radius:inherit;
+}
+.game-console{
+  padding:18px;
+  overflow-y:auto;
+  scrollbar-width:thin;
+  scrollbar-color:color-mix(in srgb,var(--game-accent) 35%,transparent) transparent;
+}
+.game-console-head{
+  margin-bottom:14px;
+}
+.game-console-head>i{
+  width:41px;
+  height:41px;
+}
+.game-options{
+  margin-bottom:13px;
+}
+.instant-page[data-game="dice"] .game-options{
+  gap:8px;
+  margin-bottom:10px;
+}
+.segmented-control button{
+  min-height:35px;
+}
+.instant-stake{
+  height:56px;
+}
+.instant-stake input{
+  font-size:1.55rem;
+}
+.instant-chips{
+  margin-bottom:12px;
+}
+.instant-action{
+  min-height:68px;
+}
+.instant-note{
+  margin-top:9px;
+}
+
+/* Crossing: a single top-down game world, without a stitched photo banner */
+.crossing-scene{
+  background:
+    radial-gradient(circle at 50% 50%,rgba(38,222,255,.09),transparent 45%),
+    linear-gradient(145deg,#071525,#030811 70%);
+}
+.crossing-cinema,
+.crossing-city-glow{
+  display:none;
+}
+.crossing-road{
+  inset:12% 0;
+  width:auto;
+  height:auto;
+  display:grid;
+  grid-template-rows:repeat(6,1fr);
+  border:0;
+  background:
+    linear-gradient(90deg,rgba(13,27,43,.96),rgba(6,15,28,.98) 45% 55%,rgba(13,27,43,.96)),
+    repeating-linear-gradient(90deg,transparent 0 10%,rgba(58,220,255,.08) 10.2% 10.5%,transparent 10.8% 20%);
+  box-shadow:inset 0 0 90px rgba(0,0,0,.45);
+  transform:none;
+}
+.crossing-lane{
+  overflow:hidden;
+  border-bottom:1px solid rgba(105,224,255,.18);
+  background:
+    linear-gradient(90deg,rgba(255,255,255,.018),transparent 22% 78%,rgba(255,255,255,.018));
+}
+.crossing-lane::before{
+  content:"";
+  position:absolute;
+  inset:auto 0 -1px;
+  height:2px;
+  background:repeating-linear-gradient(90deg,transparent 0 42px,rgba(197,238,247,.32) 42px 74px,transparent 74px 116px);
+  animation:laneDash 1.1s linear infinite;
+}
+.crossing-lane:nth-child(even)::before{
+  animation-direction:reverse;
+}
+.crossing-lane::after{
+  display:none;
+}
+.traffic-unit{
+  top:50%;
+  width:clamp(68px,9vw,105px);
+  height:clamp(31px,3.7vw,42px);
+  filter:drop-shadow(0 5px 7px rgba(0,0,0,.5)) drop-shadow(0 0 10px rgba(69,223,255,.2));
+}
+.vehicle-body{
+  inset:0;
+  border-radius:18px 25px 25px 18px;
+  background:linear-gradient(180deg,rgba(255,255,255,.88),var(--vehicle-color) 19% 78%,#111b2b);
+  box-shadow:inset 0 -7px 9px rgba(0,0,0,.28),inset 0 2px rgba(255,255,255,.5);
+}
+.truck .vehicle-body{
+  border-radius:8px 18px 18px 8px;
+}
+.vehicle-cabin{
+  left:34%;
+  top:18%;
+  width:42%;
+  height:64%;
+  border:1px solid rgba(205,248,255,.7);
+  border-radius:7px 14px 14px 7px;
+  background:linear-gradient(90deg,#15324b,#9eefff 48%,#17344d);
+  transform:none;
+}
+.truck .vehicle-cabin{
+  left:68%;
+  top:13%;
+  width:21%;
+  height:72%;
+  border-radius:5px 12px 12px 5px;
+}
+.vehicle-window,
+.vehicle-wheel{
+  display:none;
+}
+.vehicle-light{
+  right:-2px;
+  top:21%;
+  width:5px;
+  height:58%;
+  border-radius:0 8px 8px 0;
+  box-shadow:12px 0 20px 8px rgba(161,244,255,.38);
+}
+.west .vehicle-body{
+  transform:scaleX(-1);
+}
+.crossing-scene::before{
+  inset:0;
+  background:linear-gradient(90deg,transparent 30%,rgba(72,225,255,.055),transparent 70%);
+  mix-blend-mode:screen;
+  animation:roadScan 1.4s linear infinite;
+}
+.crossing-hud{
+  top:14px;
+  left:14px;
+  right:14px;
+}
+.crossing-route{
+  top:64px;
+  right:15px;
+  gap:6px;
+}
+.crossing-route span{
+  height:15px;
+}
+.crossing-route span.current{
+  height:24px;
+}
+.crossing-player{
+  width:clamp(58px,6.4vw,78px);
+  bottom:calc(var(--crossing-progress) * 12.7%);
+}
+
+/* Every board fits completely inside the repaired viewport */
+.mines-scene{
+  padding:22px;
+}
+.mines-grid{
+  width:min(100%,400px);
+  max-width:400px;
+  gap:7px;
+  padding:13px;
+  border-radius:20px;
+}
+.mine-cell{
+  border-radius:11px;
+}
+.mine-cell:disabled,
+.tower-cell:disabled{
+  opacity:1;
+}
+.mine-cell:disabled{
+  color:#a895da;
+  border-color:rgba(172,151,255,.24);
+  background:linear-gradient(145deg,#2b2642,#151126);
+}
+.plinko-scene{
+  padding:28px 5% 18px;
+}
+.plinko-board{
+  width:min(100%,520px);
+  height:min(calc(100% - 10px),410px);
+  border-radius:22px 22px 15px 15px;
+}
+.plinko-pegs{
+  inset:35px 8% 78px;
+}
+.plinko-row{
+  gap:clamp(15px,3.7vw,37px);
+}
+.plinko-peg{
+  width:9px;
+  height:9px;
+}
+.plinko-buckets{
+  bottom:9px;
+}
+.plinko-bucket{
+  min-height:43px;
+  font-size:.62rem;
+}
+.plinko-reactor{
+  top:-19px;
+}
+.plinko-reactor span{
+  width:43px;
+  height:23px;
+}
+.tower-scene{
+  padding:20px 7%;
+}
+.tower-board{
+  width:min(100%,530px);
+  gap:6px;
+  transform:rotateX(5deg);
+}
+.tower-row{
+  padding-left:30px;
+  gap:7px;
+}
+.tower-cell{
+  min-height:37px;
+  color:#aa9662;
+  border-color:rgba(255,217,92,.2);
+  background:linear-gradient(145deg,rgba(255,222,106,.1),rgba(255,255,255,.025));
+}
+.dice-scene{
+  justify-content:center;
+  padding:25px 0 20px;
+}
+.precision-die{
+  width:175px;
+  height:155px;
+  border-radius:27px;
+}
+.precision-die strong{
+  font-size:3.65rem;
+}
+.die-edge{
+  border-radius:23px;
+}
+.dice-meter{
+  width:min(76%,520px);
+  margin-top:38px;
+  padding:13px 16px 11px;
+}
+.limbo-portal{
+  width:min(68vw,330px);
+}
+.limbo-target-label{
+  bottom:6%;
+}
+
+@media(max-width:920px){
+  .instant-layout{
+    grid-template-columns:1fr;
+  }
+  .game-stage{
+    height:500px;
+  }
+  .game-console{
+    height:auto;
+    min-height:0;
+    overflow:visible;
+  }
+}
+
+@media(max-width:600px){
+  .instant-main{
+    padding-top:13px;
+  }
+  .back-to-games{
+    margin-bottom:8px;
+  }
+  .instant-title{
+    gap:8px;
+    margin-bottom:10px;
+  }
+  .instant-title h1{
+    font-size:2.6rem;
+  }
+  .instant-title p{
+    max-width:34rem;
+    font-size:.69rem;
+  }
+  .game-stage{
+    height:420px;
+    min-height:0;
+  }
+  .crossing-road{
+    inset:12% 0;
+    height:auto;
+  }
+  .traffic-unit{
+    width:64px;
+    height:29px;
+  }
+  .crossing-player{
+    width:55px;
+    bottom:calc(var(--crossing-progress) * 12.7%);
+  }
+  .mines-scene{
+    padding:16px;
+  }
+  .mines-grid{
+    width:min(100%,350px);
+    padding:10px;
+    gap:6px;
+  }
+  .plinko-scene{
+    padding:25px 2% 10px;
+  }
+  .plinko-board{
+    height:385px;
+  }
+  .tower-scene{
+    padding:16px 10px;
+  }
+  .tower-board{
+    gap:5px;
+    transform:none;
+  }
+  .tower-row{
+    padding-left:24px;
+    gap:5px;
+  }
+  .tower-cell{
+    min-height:34px;
+  }
+  .precision-die{
+    width:150px;
+    height:135px;
+  }
+  .dice-meter{
+    margin-top:32px;
+  }
+  .limbo-portal{
+    width:min(82vw,310px);
+  }
+}
