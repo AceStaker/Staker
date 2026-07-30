@@ -208,13 +208,42 @@
 
   function crossingScene() {
     const progress = Number(state.session?.progress || 0);
-    const visibleStep = progress % 6;
+    const visibleStep = Math.min(progress, 6);
+    const traffic = Array.from({ length: 6 }, (_, lane) => {
+      const direction = lane % 2 === 0 ? 'east' : 'west';
+      const vehicleType = lane % 3 === 1 ? 'truck' : 'car';
+      return `<div class="crossing-lane lane-${lane + 1}">
+        <span class="lane-dash"></span>
+        ${Array.from({ length: 2 }, (_, vehicle) => `<span class="traffic-unit ${vehicleType} ${direction} vehicle-${vehicle + 1}" aria-hidden="true">
+          <span class="vehicle-body"><i class="vehicle-cabin"></i><i class="vehicle-window"></i><i class="vehicle-light"></i><i class="vehicle-wheel wheel-a"></i><i class="vehicle-wheel wheel-b"></i></span>
+        </span>`).join('')}
+      </div>`;
+    }).join('');
     return `<div class="crossing-scene" style="--crossing-progress:${visibleStep}">
       <div class="crossing-cinema"></div>
+      <div class="crossing-city-glow"></div>
+      <div class="crossing-road">${traffic}</div>
       <div class="crossing-hud"><span>RUN <b>#${progress + 1}</b></span><span>${state.options.crossing.difficulty.toUpperCase()} TRAFFIC</span></div>
       <div class="crossing-route">${Array.from({ length: 7 }, (_, index) => `<span class="${index < visibleStep ? 'cleared' : index === visibleStep ? 'current' : ''}"></span>`).join('')}</div>
-      <div class="crossing-speedlines"></div>
-      <span class="crossing-player" aria-label="Golden chicken"><i class="fa-solid fa-crown"></i></span>
+      <span class="crossing-player" aria-label="Golden chicken">
+        <span class="runner-shadow"></span>
+        <svg viewBox="0 0 120 118" role="img" aria-hidden="true">
+          <defs>
+            <linearGradient id="chickenGold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fff8a7"/><stop offset=".42" stop-color="#ffd83d"/><stop offset="1" stop-color="#ef8c16"/></linearGradient>
+            <linearGradient id="chickenWing" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#ffe866"/><stop offset="1" stop-color="#e99917"/></linearGradient>
+            <filter id="chickenGlow"><feGaussianBlur stdDeviation="2" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+          </defs>
+          <g class="runner-legs" stroke="#ff9d22" stroke-width="6" stroke-linecap="round"><path d="M50 91v14l-9 7"/><path d="M73 91v14l10 6"/></g>
+          <path class="runner-tail" d="M34 71C14 68 9 50 13 39c8 10 18 11 28 10z" fill="#f3a21c"/>
+          <ellipse cx="58" cy="68" rx="35" ry="31" fill="url(#chickenGold)" filter="url(#chickenGlow)"/>
+          <path class="runner-wing" d="M49 62c-5 15 4 25 19 24 15-2 20-16 15-29-9 10-21 13-34 5z" fill="url(#chickenWing)"/>
+          <circle cx="78" cy="39" r="22" fill="url(#chickenGold)"/>
+          <path d="M91 39l22 8-21 9z" fill="#ff8b22"/>
+          <path d="M65 22c2-12 10-18 15-5 5-11 13-5 12 5z" fill="#ff4563"/>
+          <circle cx="84" cy="34" r="4.5" fill="#111827"/><circle cx="85.5" cy="32.5" r="1.4" fill="#fff"/>
+          <path d="M73 51c6 9 15 8 19 1-1 13-15 18-19-1z" fill="#f04d55"/>
+        </svg>
+      </span>
     </div>`;
   }
 
@@ -526,7 +555,7 @@
         await loadHistory();
       } else if (game === 'crossing') {
         document.querySelector('.crossing-player')?.classList.add('hop');
-        setTimeout(() => document.querySelector('.crossing-player')?.classList.remove('hop'), 280);
+        setTimeout(() => document.querySelector('.crossing-player')?.classList.remove('hop'), 520);
       }
     } catch (error) {
       showClientError(error);
