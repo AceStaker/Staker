@@ -15,9 +15,15 @@
       "destination": "/upload/:path*"
     }
   ],
+  "crons": [
+    {
+      "path": "/api/settle",
+      "schedule": "17 3 * * *"
+    }
+  ],
   "headers": [
     {
-      "source": "/api/(.*)",
+      "source": "/api/odds",
       "headers": [
         {
           "key": "Cache-Control",
