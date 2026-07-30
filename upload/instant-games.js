@@ -9,6 +9,9 @@
     maximumFractionDigits: 2
   })}`;
   const delay = milliseconds => new Promise(resolve => setTimeout(resolve, milliseconds));
+  const escapeHtml = value => String(value).replace(/[&<>"']/g, character => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+  })[character]);
 
   const definitions = {
     crossing: {
@@ -67,6 +70,7 @@
     lastBet: null,
     history: [],
     pending: false,
+    error: '',
     options: {
       crossing: { difficulty: 'medium' },
       mines: { mines: 5 },
@@ -81,7 +85,8 @@
   function cacheElements() {
     [
       'gameKicker', 'gameTitle', 'gameSubtitle', 'consoleTitle', 'consoleIcon',
-      'gameScene', 'gameResult', 'resultEyebrow', 'resultValue', 'resultMessage',
+      'gameStage', 'gameScene', 'gameResult', 'resultEyebrow', 'resultValue', 'resultMessage',
+      'resultReplay',
       'gameOptions', 'gameStake', 'stakeMinus', 'stakePlus', 'instantChips',
       'sessionMeter', 'sessionMultiplier', 'sessionReturn', 'primaryAction',
       'actionEyebrow', 'actionLabel', 'cashoutAction', 'gameNote',
@@ -102,6 +107,20 @@
 
   function notify(message, isError = false) {
     if (typeof window.showToast === 'function') window.showToast(message, isError);
+  }
+
+  function showClientError(error) {
+    const message = error?.message || 'The game could not complete that action. Please try again.';
+    state.error = message;
+    notify(message, true);
+    els.gameNote.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(message)}`;
+    els.gameNote.classList.add('error');
+  }
+
+  function revealStage() {
+    if (window.matchMedia('(max-width: 920px)').matches) {
+      els.gameStage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 
   function setBalance(value) {
@@ -189,10 +208,13 @@
 
   function crossingScene() {
     const progress = Number(state.session?.progress || 0);
-    return `<div class="crossing-scene">
-      <div class="crossing-step">SAFE LANES <b>${progress}</b></div>
-      <div class="crossing-lanes">${Array.from({ length: 5 }, (_, index) => `<div class="crossing-lane"><span class="traffic-car" style="animation-delay:-${index * .83}s"><i class="fa-solid ${index % 3 === 2 ? 'fa-truck-pickup' : 'fa-car-side'}"></i></span></div>`).join('')}</div>
-      <span class="crossing-player" style="bottom:${15 + Math.min(progress, 5) * 82}px"><i class="fa-solid fa-feather-pointed"></i></span>
+    const visibleStep = progress % 6;
+    return `<div class="crossing-scene" style="--crossing-progress:${visibleStep}">
+      <div class="crossing-cinema"></div>
+      <div class="crossing-hud"><span>RUN <b>#${progress + 1}</b></span><span>${state.options.crossing.difficulty.toUpperCase()} TRAFFIC</span></div>
+      <div class="crossing-route">${Array.from({ length: 7 }, (_, index) => `<span class="${index < visibleStep ? 'cleared' : index === visibleStep ? 'current' : ''}"></span>`).join('')}</div>
+      <div class="crossing-speedlines"></div>
+      <span class="crossing-player" aria-label="Golden chicken"><i class="fa-solid fa-crown"></i></span>
     </div>`;
   }
 
@@ -205,8 +227,8 @@
         const revealed = picks.includes(index);
         const isMine = mines.includes(index);
         const className = isMine ? 'mine' : revealed ? 'revealed' : '';
-        const icon = isMine ? '<i class="fa-solid fa-bomb"></i>' : revealed ? '<i class="fa-solid fa-gem"></i>' : '<i class="fa-solid fa-question"></i>';
-        return `<button type="button" class="mine-cell ${className}" data-choice="${index}" ${state.session && !revealed && !state.pending ? '' : 'disabled'}>${icon}</button>`;
+        const icon = isMine ? '<i class="fa-solid fa-burst"></i>' : revealed ? '<i class="fa-solid fa-gem"></i>' : '<span class="vault-facet"></span>';
+        return `<button type="button" class="mine-cell ${className}" data-choice="${index}" aria-label="Vault tile ${index + 1}" ${state.session && !revealed && !state.pending ? '' : 'disabled'}>${icon}<small>${String(index + 1).padStart(2, '0')}</small></button>`;
       }).join('')}
     </div></div>`;
   }
@@ -220,6 +242,8 @@
   function plinkoScene() {
     const risk = state.options.plinko.risk;
     return `<div class="plinko-scene"><div class="plinko-board">
+      <div class="plinko-reactor"><span></span><b>GRAVITY CORE</b></div>
+      <div class="plinko-rail rail-left"></div><div class="plinko-rail rail-right"></div>
       <span class="live-plinko-ball" id="livePlinkoBall"></span>
       <div class="plinko-pegs">${Array.from({ length: 8 }, (_, row) => `<div class="plinko-row">${Array.from({ length: row + 2 }, () => '<span class="plinko-peg"></span>').join('')}</div>`).join('')}</div>
       <div class="plinko-buckets">${plinkoMultipliers[risk].map((value, index) => `<span class="plinko-bucket ${index === 0 || index === 8 ? 'hot' : ''}" data-bucket="${index}">${Number(value).toFixed(value < 1 ? 2 : 1)}×</span>`).join('')}</div>
@@ -235,11 +259,12 @@
       ${Array.from({ length: 8 }, (_, row) => {
         const complete = row < progress;
         const active = row === progress && Boolean(state.session);
-        return `<div class="tower-row ${complete ? 'completed' : active ? 'active' : ''}">
+        return `<div class="tower-row ${complete ? 'completed' : active ? 'active' : ''}" style="--floor:${row}">
+          <span class="tower-floor">${String(row + 1).padStart(2, '0')}</span>
           ${Array.from({ length: 3 }, (_, column) => {
             const selected = picks[row] === column;
             const failedCell = Number(failedRow) === row && Number(failed) === column;
-            return `<button class="tower-cell ${selected ? 'selected' : ''} ${failedCell ? 'failed' : ''}" data-choice="${column}" ${active && !state.pending ? '' : 'disabled'}><i class="fa-solid ${selected ? 'fa-star' : failedCell ? 'fa-xmark' : 'fa-shield'}"></i></button>`;
+            return `<button class="tower-cell ${selected ? 'selected' : ''} ${failedCell ? 'failed' : ''}" data-choice="${column}" aria-label="Floor ${row + 1}, platform ${column + 1}" ${active && !state.pending ? '' : 'disabled'}><span></span><i class="fa-solid ${selected ? 'fa-crown' : failedCell ? 'fa-xmark' : 'fa-diamond'}"></i></button>`;
           }).join('')}
         </div>`;
       }).join('')}
@@ -251,9 +276,15 @@
     const target = state.options.dice.target;
     const mode = state.options.dice.mode;
     return `<div class="dice-scene">
-      <div class="precision-die" id="precisionDie"><strong id="diceRollValue">${roll == null ? '—' : Number(roll).toFixed(2)}</strong></div>
-      <div class="dice-line" style="background:linear-gradient(90deg,#56e7b8 0 ${target}%,#ff5878 ${target}% 100%)"></div>
-      <div class="dice-line-labels"><span>0.00</span><b>${mode.toUpperCase()} ${Number(target).toFixed(2)}</b><span>99.99</span></div>
+      <div class="dice-orbit orbit-one"></div><div class="dice-orbit orbit-two"></div>
+      <div class="precision-die" id="precisionDie">
+        <span class="die-edge edge-one"></span><span class="die-edge edge-two"></span>
+        <small>VERIFIED ROLL</small><strong id="diceRollValue">${roll == null ? '—' : Number(roll).toFixed(2)}</strong>
+      </div>
+      <div class="dice-meter">
+        <div class="dice-line" style="--target:${target}%;background:linear-gradient(90deg,#56e7b8 0 ${target}%,#ff5878 ${target}% 100%)"><span style="left:${target}%"></span></div>
+        <div class="dice-line-labels"><span>0.00</span><b>${mode.toUpperCase()} ${Number(target).toFixed(2)}</b><span>99.99</span></div>
+      </div>
     </div>`;
   }
 
@@ -261,7 +292,9 @@
     const crash = state.lastBet?.details?.crash;
     const target = state.options.limbo.target;
     return `<div class="limbo-scene">
-      <div class="limbo-portal" id="limboPortal"><strong id="limboValue">${crash == null ? '1.00' : Number(crash).toFixed(2)}<span>×</span></strong></div>
+      <div class="limbo-grid"></div>
+      <div class="limbo-particles">${Array.from({ length: 18 }, (_, index) => `<i style="--i:${index};--x:${8 + index * 5}%;--y:${16 + (index * 17) % 68}%"></i>`).join('')}</div>
+      <div class="limbo-portal" id="limboPortal"><div class="portal-core"></div><small>QUANTUM HEIGHT</small><strong id="limboValue">${crash == null ? '1.00' : Number(crash).toFixed(2)}<span>×</span></strong></div>
       <div class="limbo-target-label">TARGET <b>${Number(target).toFixed(2)}×</b></div>
     </div>`;
   }
@@ -298,6 +331,8 @@
     els.primaryAction.disabled = state.pending || (!signedIn ? false : !active && !currentStake);
 
     if (!signedIn) {
+      state.error = '';
+      els.gameNote.classList.remove('error');
       els.actionEyebrow.textContent = 'ACCOUNT REQUIRED';
       els.actionLabel.textContent = 'SIGN IN TO PLAY';
       els.gameNote.innerHTML = '<i class="fa-solid fa-lock"></i> The full game stays visible. Sign in to unlock demo-credit play.';
@@ -319,6 +354,12 @@
       els.actionLabel.textContent = `${definitions[game].action} · ${money(currentStake)}`;
       els.gameNote.innerHTML = '<i class="fa-solid fa-circle-info"></i> Results are server-decided and wallet updates are atomic.';
     }
+    if (state.error) {
+      els.gameNote.classList.add('error');
+      els.gameNote.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${escapeHtml(state.error)}`;
+    } else {
+      els.gameNote.classList.remove('error');
+    }
   }
 
   function showResult(bet) {
@@ -334,6 +375,7 @@
     els.resultMessage.textContent = returned
       ? `${money(bet.payout)} credited to your demo balance.`
       : 'The round ended before cash-out.';
+    els.resultReplay.focus({ preventScroll: true });
   }
 
   async function animateInstantResult(bet) {
@@ -433,8 +475,10 @@
       return;
     }
     state.pending = true;
+    state.error = '';
     els.gameResult.hidden = true;
     renderControls();
+    revealStage();
     try {
       const { data, error } = await state.backend.client.rpc('instant_game_start', {
         p_game: game,
@@ -453,7 +497,7 @@
       }
       await loadHistory();
     } catch (error) {
-      notify(error.message, true);
+      showClientError(error);
     } finally {
       state.pending = false;
       renderControls();
@@ -463,6 +507,7 @@
   async function playStep(choice = null) {
     if (!state.session || state.pending) return;
     state.pending = true;
+    state.error = '';
     renderControls();
     try {
       const { data, error } = await state.backend.client.rpc('instant_game_action', {
@@ -484,7 +529,7 @@
         setTimeout(() => document.querySelector('.crossing-player')?.classList.remove('hop'), 280);
       }
     } catch (error) {
-      notify(error.message, true);
+      showClientError(error);
     } finally {
       state.pending = false;
       renderControls();
@@ -494,6 +539,7 @@
   async function cashOut() {
     if (!state.session || state.pending) return;
     state.pending = true;
+    state.error = '';
     renderControls();
     try {
       const { data, error } = await state.backend.client.rpc('instant_game_action', {
@@ -510,7 +556,7 @@
       notify(`${money(data.bet.payout)} credited to your demo balance.`);
       await loadHistory();
     } catch (error) {
-      notify(error.message, true);
+      showClientError(error);
     } finally {
       state.pending = false;
       renderControls();
@@ -558,7 +604,10 @@
       els.gameStake.value = button.dataset.stake;
       renderControls();
     });
-    els.gameResult.addEventListener('click', () => { els.gameResult.hidden = true; });
+    els.resultReplay.addEventListener('click', () => {
+      els.gameResult.hidden = true;
+      els.primaryAction.focus({ preventScroll: true });
+    });
     window.addEventListener('ace:session', restoreSession);
   }
 
