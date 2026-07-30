@@ -303,10 +303,15 @@
   function updatePlane(elapsedMs) {
     const elapsed = Math.max(0, elapsedMs / 1000);
     const progress = Math.min(.985, 1 - Math.exp(-elapsed / 11));
-    const x = 12 + (78 * progress);
+    const compact = window.innerWidth <= 600;
+    const x = (compact ? 24 : 12) + ((compact ? 66 : 78) * progress);
     const y = 80 - (61 * Math.pow(progress, .78));
+    const bank = -4 + (7 * progress) + (Math.sin(elapsed * 1.15) * .7);
+    const scale = .72 + (.32 * progress);
     els.planeWrap.style.setProperty('--plane-x', `${x}%`);
     els.planeWrap.style.setProperty('--plane-y', `${y}%`);
+    els.planeWrap.style.setProperty('--plane-bank', `${bank}deg`);
+    els.planeWrap.style.setProperty('--plane-scale', scale.toFixed(3));
   }
 
   function sizeCanvas(canvas, context) {
@@ -335,7 +340,8 @@
       : Math.min(.985, 1 - Math.exp(-elapsed / 11));
     const startX = rect.width * .10;
     const startY = rect.height * .82;
-    const endX = rect.width * (.12 + .78 * progress);
+    const compact = rect.width <= 600;
+    const endX = rect.width * ((compact ? .24 : .12) + (compact ? .66 : .78) * progress);
     const endY = rect.height * (.80 - .61 * Math.pow(progress, .78));
 
     const gradient = context.createLinearGradient(startX, startY, endX, endY);
