@@ -204,6 +204,14 @@
     if (activeBet && flying) {
       const multiplier = roundMultiplier(round);
       const payout = Number(bet.stake) * multiplier;
+      if (multiplier < 1.10) {
+        els.flightAction.classList.add('waiting');
+        els.flightAction.disabled = true;
+        els.actionEyebrow.textContent = 'FLIGHT JUST STARTED';
+        els.actionLabel.textContent = 'CASH OUT OPENS AT 1.10×';
+        els.consoleNote.innerHTML = '<i class="fa-solid fa-gauge-high"></i> Manual cash-out unlocks when the live multiplier reaches 1.10×.';
+        return;
+      }
       els.flightAction.classList.add('cashout');
       els.actionEyebrow.textContent = `CASH OUT AT ${multiplier.toFixed(2)}×`;
       els.actionLabel.textContent = `COLLECT ${money(payout)}`;
