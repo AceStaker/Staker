@@ -477,6 +477,7 @@
   function activateExtendedAdminTab(name) {
     document.querySelectorAll('[data-admin-tab]').forEach(button => button.classList.toggle('active', button.dataset.adminTab === name));
     document.querySelectorAll('[data-admin-panel]').forEach(panel => panel.classList.toggle('active', panel.dataset.adminPanel === name));
+    window.AceOperationsNavigation?.sync();
   }
 
   async function mountOperationsExtensions(attempt = 0) {
@@ -489,13 +490,13 @@
     if (document.querySelector('[data-admin-tab="platform"]')) return;
     const tabs = workspace.querySelector('.admin-tabs');
     tabs.insertAdjacentHTML('beforeend', `
-      <button type="button" data-admin-tab="cashouts"><i class="fa-solid fa-money-bill-transfer"></i><span><b>Withdrawals</b><small>Approve balance requests</small></span></button>
-      <button type="button" data-admin-tab="risk"><i class="fa-solid fa-shield-halved"></i><span><b>Risk</b><small>Suspicious activity</small></span></button>
-      <button type="button" data-admin-tab="support"><i class="fa-solid fa-headset"></i><span><b>Support</b><small>Tickets and replies</small></span></button>
-      <button type="button" data-admin-tab="platform"><i class="fa-solid fa-toggle-on"></i><span><b>Platform</b><small>Features and maintenance</small></span></button>
-      <button type="button" data-admin-tab="health"><i class="fa-solid fa-heart-pulse"></i><span><b>System health</b><small>Database and workflows</small></span></button>
-      <button type="button" data-admin-tab="odds-feed"><i class="fa-solid fa-cloud-arrow-down"></i><span><b>Odds feed</b><small>The Odds API sync</small></span></button>
-      <button type="button" data-admin-tab="live-control"><i class="fa-solid fa-satellite-dish"></i><span><b>Live control</b><small>Scores and event state</small></span></button>`);
+      <button type="button" data-admin-tab="cashouts"><i class="fa-solid fa-money-bill-transfer"></i><span><b>Withdrawals</b></span></button>
+      <button type="button" data-admin-tab="risk"><i class="fa-solid fa-shield-halved"></i><span><b>Risk review</b></span></button>
+      <button type="button" data-admin-tab="support"><i class="fa-solid fa-headset"></i><span><b>Support</b></span></button>
+      <button type="button" data-admin-tab="platform"><i class="fa-solid fa-toggle-on"></i><span><b>Platform</b></span></button>
+      <button type="button" data-admin-tab="health"><i class="fa-solid fa-heart-pulse"></i><span><b>System health</b></span></button>
+      <button type="button" data-admin-tab="odds-feed"><i class="fa-solid fa-cloud-arrow-down"></i><span><b>Odds feed</b></span></button>
+      <button type="button" data-admin-tab="live-control"><i class="fa-solid fa-satellite-dish"></i><span><b>Live control</b></span></button>`);
     workspace.insertAdjacentHTML('beforeend', `
       <section class="admin-tab-panel admin-extension-panel" data-admin-panel="cashouts"><div id="adminCashoutsPanel"></div></section>
       <section class="admin-tab-panel admin-extension-panel" data-admin-panel="risk"><div id="adminRiskPanel"></div></section>
@@ -515,6 +516,7 @@
         if (button.dataset.adminTab === 'odds-feed') await loadAdminOddsFeed();
         if (button.dataset.adminTab === 'live-control') await loadAdminLive();
       }));
+    window.AceOperationsNavigation?.refresh();
   }
 
   async function loadAdminCashouts() {

@@ -15,7 +15,6 @@
   let adminBetRows = [];
   let adminTransactionRows = [];
   let adminAuditRows = [];
-  let operationsRefreshTimer = null;
   let publicMarketsRefreshTimer = null;
   const marketUiIds = new Map();
   let nextMarketUiId = 1000;
@@ -156,7 +155,6 @@
                   <option value="90">Last 90 days</option>
                 </select>
                 <button type="button" id="opsRefresh"><i class="fa-solid fa-rotate"></i> Refresh</button>
-                <label class="ops-auto"><input type="checkbox" id="opsAutoRefresh"> Auto 60s</label>
               </div>
             </div>
             <div id="opsFinancialStats" class="ops-metric-grid"><div class="panel-empty">Loading operational metrics…</div></div>
@@ -189,6 +187,7 @@
           </section>
 
           <section class="admin-tab-panel" data-admin-panel="users">
+            <div class="ops-panel-head"><div><span class="ops-eyebrow">PLAYER MANAGEMENT</span><h3>Players</h3><p>Find accounts, review activity, adjust demo balances, and apply responsible-play controls.</p></div></div>
             <form id="adminUserSearch" class="admin-user-toolbar">
               <input id="adminUserQuery" type="search" maxlength="100" placeholder="Search name or email" aria-label="Search users">
               <select id="adminUserStatus" aria-label="Filter users">
@@ -204,8 +203,9 @@
           </section>
 
           <section class="admin-tab-panel" data-admin-panel="operations">
-            <details class="admin-create">
-              <summary>Create event</summary>
+            <div class="ops-panel-head"><div><span class="ops-eyebrow">SPORTSBOOK</span><h3>Markets and settlement</h3><p>Review active events, manage availability and odds, or settle an event manually when required.</p></div></div>
+            <details class="admin-create admin-legacy-tool">
+              <summary><span><i class="fa-solid fa-screwdriver-wrench"></i> Manual event tools</span><small>For testing or provider outages</small></summary>
               <form id="adminEventForm" class="admin-event-form">
                 <label class="auth-field"><span>Sport</span><input id="adminSport" required maxlength="60"></label>
                 <label class="auth-field"><span>League</span><input id="adminLeague" required maxlength="100"></label>
@@ -343,7 +343,6 @@
     document.getElementById('adminBroadcastMessage').addEventListener('input', updateBroadcastPreview);
     document.getElementById('opsRange').addEventListener('change', loadOperationsOverview);
     document.getElementById('opsRefresh').addEventListener('click', loadOperationsOverview);
-    document.getElementById('opsAutoRefresh').addEventListener('change', toggleOperationsAutoRefresh);
     document.getElementById('adminAuditFilter').addEventListener('click', renderFilteredAudit);
     document.getElementById('adminAuditQuery').addEventListener('input', renderFilteredAudit);
     document.getElementById('adminAuditType').addEventListener('change', renderFilteredAudit);
@@ -368,25 +367,94 @@
     root.appendChild(panel);
     overlay.remove();
 
-    const tabs = panel.querySelector('.admin-tabs');
-    tabs?.insertAdjacentHTML('afterbegin', `
-      <div class="operations-nav-label">Workspace</div>
-    `);
     panel.querySelector('[data-admin-tab="overview"]').innerHTML =
-      '<i class="fa-solid fa-chart-pie"></i><span><b>Overview</b><small>Performance and risk</small></span>';
+      '<i class="fa-solid fa-chart-pie"></i><span><b>Overview</b></span>';
     panel.querySelector('[data-admin-tab="bets"]').innerHTML =
-      '<i class="fa-solid fa-ticket"></i><span><b>Bet monitor</b><small>Search, inspect and void</small></span>';
+      '<i class="fa-solid fa-ticket"></i><span><b>Bets</b></span>';
     panel.querySelector('[data-admin-tab="wallet"]').innerHTML =
-      '<i class="fa-solid fa-wallet"></i><span><b>Wallet ledger</b><small>All credit movements</small></span>';
+      '<i class="fa-solid fa-receipt"></i><span><b>Transactions</b></span>';
     panel.querySelector('[data-admin-tab="users"]').innerHTML =
-      '<i class="fa-solid fa-users"></i><span><b>User controls</b><small>Profiles, limits and notes</small></span>';
+      '<i class="fa-solid fa-users"></i><span><b>Players</b></span>';
     panel.querySelector('[data-admin-tab="operations"]').innerHTML =
-      '<i class="fa-solid fa-chart-line"></i><span><b>Markets</b><small>Events, odds and settlement</small></span>';
+      '<i class="fa-solid fa-chart-line"></i><span><b>Markets</b></span>';
     panel.querySelector('[data-admin-tab="communications"]').innerHTML =
-      '<i class="fa-solid fa-bullhorn"></i><span><b>Communications</b><small>Broadcast notifications</small></span>';
+      '<i class="fa-solid fa-bullhorn"></i><span><b>Announcements</b></span>';
     panel.querySelector('[data-admin-tab="audit"]').innerHTML =
-      '<i class="fa-solid fa-clipboard-list"></i><span><b>Audit trail</b><small>Administrator activity</small></span>';
+      '<i class="fa-solid fa-clipboard-list"></i><span><b>Audit log</b></span>';
+    organizeOperationsNavigation();
   }
+
+  const operationsNavGroups = [
+    { label: 'Daily operations', tabs: ['overview', 'cashouts', 'users', 'bets', 'operations', 'odds-feed'] },
+    { label: 'Safety and service', tabs: ['risk', 'support'] },
+    {
+      label: 'More tools',
+      tabs: ['wallet', 'communications', 'live-control', 'platform', 'health', 'audit'],
+      collapsible: true
+    }
+  ];
+
+  function organizeOperationsNavigation() {
+    if (!operationsPage) return;
+    const workspace = document.querySelector('.operations-workspace');
+    const tabs = workspace?.querySelector('.admin-tabs');
+    if (!workspace || !tabs) return;
+
+    tabs.querySelectorAll('.operations-nav-group,.operations-nav-more').forEach(group => {
+      [...group.querySelectorAll('[data-admin-tab]')].forEach(button => tabs.appendChild(button));
+      group.remove();
+    });
+    tabs.querySelectorAll('.operations-nav-label').forEach(label => label.remove());
+
+    operationsNavGroups.forEach(group => {
+      const available = group.tabs
+        .map(name => tabs.querySelector(`[data-admin-tab="${name}"]`))
+        .filter(Boolean);
+      if (!available.length) return;
+      const container = document.createElement(group.collapsible ? 'details' : 'div');
+      container.className = group.collapsible ? 'operations-nav-more' : 'operations-nav-group';
+      if (group.collapsible && available.some(button => button.classList.contains('active'))) container.open = true;
+      container.innerHTML = group.collapsible
+        ? `<summary><span>${group.label}</span><i class="fa-solid fa-chevron-down"></i></summary>`
+        : `<div class="operations-nav-label">${group.label}</div>`;
+      available.forEach(button => container.appendChild(button));
+      tabs.appendChild(container);
+    });
+
+    let mobileNav = workspace.querySelector('.operations-mobile-nav');
+    if (!mobileNav) {
+      mobileNav = document.createElement('label');
+      mobileNav.className = 'operations-mobile-nav';
+      mobileNav.innerHTML = '<span>Workspace section</span><select aria-label="Workspace section"></select>';
+      tabs.insertAdjacentElement('beforebegin', mobileNav);
+      mobileNav.querySelector('select').addEventListener('change', event => {
+        tabs.querySelector(`[data-admin-tab="${event.target.value}"]`)?.click();
+      });
+    }
+    const select = mobileNav.querySelector('select');
+    select.innerHTML = operationsNavGroups.map(group => {
+      const options = group.tabs.map(name => {
+        const button = tabs.querySelector(`[data-admin-tab="${name}"]`);
+        return button ? `<option value="${name}">${button.textContent.trim()}</option>` : '';
+      }).join('');
+      return options ? `<optgroup label="${group.label}">${options}</optgroup>` : '';
+    }).join('');
+    syncOperationsNavigation();
+  }
+
+  function syncOperationsNavigation() {
+    if (!operationsPage) return;
+    const active = document.querySelector('[data-admin-tab].active')?.dataset.adminTab;
+    const select = document.querySelector('.operations-mobile-nav select');
+    if (select && active) select.value = active;
+    const more = document.querySelector('.operations-nav-more');
+    if (more?.querySelector('[data-admin-tab].active')) more.open = true;
+  }
+
+  window.AceOperationsNavigation = {
+    refresh: organizeOperationsNavigation,
+    sync: syncOperationsNavigation
+  };
 
   function updateOperationsAccess() {
     if (!operationsPage) return;
@@ -760,6 +828,7 @@
     if (tab === 'users') loadAdminUsers();
     if (tab === 'operations') loadAdminDashboard();
     if (tab === 'audit') loadAdminAudit();
+    syncOperationsNavigation();
   }
 
   async function loadOperationsOverview() {
@@ -815,17 +884,6 @@
       <div class="ops-feed-row"><i class="fa-solid fa-shield"></i><span><strong>${escapeHtml(item.action.replaceAll('.', ' '))}</strong><small>${escapeHtml(item.admin_name)} · ${new Date(item.created_at).toLocaleString()}</small></span></div>`).join('') : '<div class="panel-empty compact">No recent administrator activity.</div>';
   }
 
-  function toggleOperationsAutoRefresh() {
-    window.clearInterval(operationsRefreshTimer);
-    operationsRefreshTimer = null;
-    if (document.getElementById('opsAutoRefresh')?.checked) {
-      operationsRefreshTimer = window.setInterval(() => {
-        if (document.visibilityState === 'visible' && currentUserIsAdmin) loadOperationsOverview();
-      }, 60000);
-      notify('Automatic refresh enabled.');
-    }
-  }
-
   async function loadAdminBets() {
     const container = document.getElementById('adminBetFeed');
     container.innerHTML = '<div class="panel-empty">Loading wagers…</div>';
@@ -847,11 +905,11 @@
         ${adminBetRows.map(bet => `
           <details class="ops-table-record">
             <summary>
-              <span><b>${escapeHtml(bet.display_name || bet.email)}</b><small>${escapeHtml(bet.email)} · ${escapeHtml(bet.id.slice(0, 8))}</small></span>
-              <span>${money(bet.stake)}</span><span>${money(bet.potential_payout)}</span>
-              <span><b class="ops-status ops-status-${escapeHtml(bet.status)}">${escapeHtml(bet.status)}</b></span>
-              <span>${new Date(bet.placed_at).toLocaleString()}</span>
-              <span>${bet.status === 'pending' ? `<button type="button" class="ops-danger-btn" data-void-bet="${bet.id}">Void & refund</button>` : '—'}</span>
+              <span data-label="Player / Bet"><b>${escapeHtml(bet.display_name || bet.email)}</b><small>${escapeHtml(bet.email)} · ${escapeHtml(bet.id.slice(0, 8))}</small></span>
+              <span data-label="Stake">${money(bet.stake)}</span><span data-label="Potential">${money(bet.potential_payout)}</span>
+              <span data-label="Status"><b class="ops-status ops-status-${escapeHtml(bet.status)}">${escapeHtml(bet.status)}</b></span>
+              <span data-label="Placed">${new Date(bet.placed_at).toLocaleString()}</span>
+              <span data-label="Action">${bet.status === 'pending' ? `<button type="button" class="ops-danger-btn" data-void-bet="${bet.id}">Void & refund</button>` : '—'}</span>
             </summary>
             <div class="ops-record-detail">
               <div class="ops-record-meta"><span>Type <b>${escapeHtml(bet.kind)}</b></span><span>Total odds <b>${Number(bet.total_odds).toFixed(2)}</b></span><span>Settled payout <b>${money(bet.settled_payout)}</b></span></div>
@@ -898,10 +956,10 @@
       <div class="ops-data-table ops-ledger-table">
         <div class="ops-table-head"><span>Player</span><span>Type</span><span>Amount</span><span>Balance after</span><span>Description</span><span>Time</span></div>
         ${adminTransactionRows.map(tx => `<div class="ops-table-row">
-          <span><b>${escapeHtml(tx.display_name || tx.email)}</b><small>${escapeHtml(tx.email)}</small></span>
-          <span><b class="ops-status">${escapeHtml(String(tx.kind).replaceAll('_', ' '))}</b></span>
-          <span class="${Number(tx.amount) >= 0 ? 'credit' : 'debit'}">${Number(tx.amount) >= 0 ? '+' : ''}${money(tx.amount)}</span>
-          <span>${money(tx.balance_after)}</span><span>${escapeHtml(tx.description)}</span><span>${new Date(tx.created_at).toLocaleString()}</span>
+          <span data-label="Player"><b>${escapeHtml(tx.display_name || tx.email)}</b><small>${escapeHtml(tx.email)}</small></span>
+          <span data-label="Type"><b class="ops-status">${escapeHtml(String(tx.kind).replaceAll('_', ' '))}</b></span>
+          <span data-label="Amount" class="${Number(tx.amount) >= 0 ? 'credit' : 'debit'}">${Number(tx.amount) >= 0 ? '+' : ''}${money(tx.amount)}</span>
+          <span data-label="Balance after">${money(tx.balance_after)}</span><span data-label="Description">${escapeHtml(tx.description)}</span><span data-label="Time">${new Date(tx.created_at).toLocaleString()}</span>
         </div>`).join('')}
       </div>` : '<div class="panel-empty">No transactions match these filters.</div>';
   }
@@ -1227,12 +1285,13 @@
       return;
     }
     const events = data?.events || [];
-    eventsContainer.innerHTML = events.length ? events.map(event => `
-      <article class="admin-event" data-event-id="${event.id}">
-        <div class="admin-event-head">
+    eventsContainer.innerHTML = events.length ? events.map((event, index) => `
+      <details class="admin-event" data-event-id="${event.id}" ${index === 0 ? 'open' : ''}>
+        <summary class="admin-event-head">
           <div><strong>${escapeHtml(event.home_team)} vs ${escapeHtml(event.away_team)}</strong><span>${escapeHtml(event.sport)} · ${escapeHtml(event.league)} · ${new Date(event.starts_at).toLocaleString()}</span></div>
-          <b>${escapeHtml(event.status)}</b>
-        </div>
+          <span class="admin-event-state"><b>${escapeHtml(event.status)}</b><i class="fa-solid fa-chevron-down"></i></span>
+        </summary>
+        <div class="admin-event-body">
         <div class="ops-event-controls">
           <label>Event
             <select data-event-status><option value="scheduled" ${event.status === 'scheduled' ? 'selected' : ''}>Scheduled</option><option value="live" ${event.status === 'live' ? 'selected' : ''}>Live</option></select>
@@ -1245,15 +1304,15 @@
         <div class="admin-selections">
           ${(event.selections || []).map(selection => `
             <div class="admin-selection" data-selection-id="${selection.id}">
-              <span>${escapeHtml(selection.label)}</span>
-              <input type="number" min="1.01" max="1000" step=".01" value="${Number(selection.odds)}" aria-label="Odds for ${escapeHtml(selection.label)}">
-              <label><input type="checkbox" ${selection.is_active ? 'checked' : ''}> Active</label>
-              <button type="button" data-admin-action="save-odds">Save</button>
-              <button type="button" data-admin-action="settle">Winner</button>
+              <strong class="admin-selection-name">${escapeHtml(selection.label)}</strong>
+              <label class="admin-selection-odds"><span>Odds</span><input type="number" min="1.01" max="1000" step=".01" value="${Number(selection.odds)}" aria-label="Odds for ${escapeHtml(selection.label)}"></label>
+              <label class="admin-selection-active"><input type="checkbox" ${selection.is_active ? 'checked' : ''}> Available</label>
+              <div class="admin-selection-actions"><button type="button" data-admin-action="save-odds">Save odds</button><button type="button" data-admin-action="settle">Set winner</button></div>
             </div>`).join('')}
         </div>
         <button class="admin-void" type="button" data-admin-action="void">Void event and refund</button>
-      </article>`).join('') : '<div class="panel-empty">No scheduled or live events.</div>';
+        </div>
+      </details>`).join('') : '<div class="panel-empty">No scheduled or live events.</div>';
 
     eventsContainer.querySelectorAll('[data-admin-action]').forEach(button => {
       button.addEventListener('click', handleAdminAction);
