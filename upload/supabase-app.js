@@ -633,7 +633,15 @@
       .eq('is_active', true)
       .eq('markets.status', 'open');
     if (error || !data?.length) {
-      console.warn('Using bundled demo markets:', error?.message);
+      window.AceUI.replaceMarkets([], [{ key: 'All', icon: 'fa-layer-group' }]);
+      window.AceUI.renderAllMarkets();
+      const refreshLabel = document.getElementById('refreshLabel');
+      if (refreshLabel) {
+        refreshLabel.textContent = error
+          ? 'Provider markets are temporarily unavailable.'
+          : 'No open provider markets right now.';
+      }
+      if (error) console.error('Could not load provider markets:', error.message);
       return;
     }
 
@@ -657,7 +665,7 @@
           live_score: event.live_score || '—',
           live_clock: event.live_clock,
           status: event.status === 'live' ? 'Live' : `Upcoming ${new Date(event.starts_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
-          trend: { home: 50, draw: 0, away: 50 }
+          trend: null
         });
       }
       const match = grouped.get(event.id);
@@ -715,7 +723,7 @@
           .map(item => ({ kind: 'single', stake: Number(item.singleStake), selection_ids: [item.selectionId] }));
 
     if (bets.some(bet => bet.selection_ids.some(id => !id))) {
-      throw new Error('This bundled market is not connected to the database. Choose one of the newly loaded markets.');
+      throw new Error('This market is not connected to the database. Refresh and choose an available provider market.');
     }
     const { data, error } = await client.rpc('place_bets', { p_bets: bets });
     if (error) throw error;

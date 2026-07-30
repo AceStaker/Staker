@@ -78,27 +78,10 @@
 
   <main class="main-content">
 
-    <!-- PLAYER PROGRESS — XP / Level / Rank / Streak (gaming logic layer) -->
-    <section class="progress-card glass">
-      <div class="progress-rank-badge"><i class="fa-solid fa-crown" id="rankBadgeIcon"></i></div>
-      <div class="progress-main">
-        <div class="progress-top-row">
-          <span class="lvl-text">Level <span id="levelNum">12</span> · <span class="rank-name" id="rankName">Gold Staker</span></span>
-          <span class="xp-text"><span id="xpCurrent">0</span> / <span id="xpNeeded">1200</span> XP to Level <span id="nextLevelNum">13</span></span>
-        </div>
-        <div class="xp-bar"><div class="xp-bar-fill" id="xpBarFill" style="width:0%;"></div></div>
-      </div>
-      <div class="progress-streak">
-        <i class="fa-solid fa-fire flame" id="streakFlame"></i>
-        <span class="streak-num" id="streakNum">0</span>
-        <span class="streak-lbl">Win Streak</span>
-      </div>
-    </section>
-
     <!-- SPORT TABS -->
     <div class="sport-tabs" id="sportTabs"><!-- populated by JS --></div>
 
-    <div class="refresh-note"><span class="spinner" id="oddsSpinner"></span> <span id="refreshLabel">Live odds updated just now</span></div>
+    <div class="refresh-note"><span class="spinner" id="oddsSpinner"></span> <span id="refreshLabel">Loading provider markets…</span></div>
 
     <h2 class="section-title" id="matchesSection"><i class="fa-solid fa-fire"></i> Today's Matches</h2>
     <div class="matches-list" id="matchesList"><!-- populated by JS --></div>

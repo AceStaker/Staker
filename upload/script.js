@@ -1,59 +1,26 @@
 /* =========================================================
    ACE STAKER — APP LOGIC (Vanilla ES6+)
    Sections:
-   1. Mock Data (matches, sports, history, promos, faq)
+   1. Content data and provider-backed sports markets
    2. State (incl. gamification: level/xp/rank/streak/achievements)
    3. Render: Ticker / Sport Tabs / Matches / Trending bars
    4. Bet Slip logic (add/remove, single vs parlay, combo boost, payout calc)
    5. Gamification engine: XP, levels, ranks, streaks, achievements, confetti
-   6. Simulated live updates (odds, ticker, big-win feed) via setInterval
+   6. Provider-backed market refresh
    7. Extra content: Promotions / FAQ render
    8. Modals, dropdown, theme toggle, mobile nav, smooth-scroll nav filters
    ========================================================= */
 
-/* ---------- 1. MOCK DATA ---------- */
-// Structure mirrors the spec: id, sport, league, teams, odds{home,draw,away}, live_score, status
-let matches = [
-  { id:1, sport:"Basketball", league:"NBA", team1:"Lakers", team2:"Celtics",
-    odds:{ home:2.10, draw:null, away:1.85 }, live_score:"72 - 68", status:"Live", trend:{home:58,draw:0,away:42} },
-  { id:2, sport:"Football", league:"UEFA Champions League", team1:"Real Madrid", team2:"Bayern Munich",
-    odds:{ home:1.95, draw:3.40, away:2.15 }, live_score:"1 - 1", status:"Half Time", trend:{home:44,draw:20,away:36} },
-  { id:3, sport:"Tennis", league:"ATP Masters", team1:"Alcaraz", team2:"Sinner",
-    odds:{ home:1.65, draw:null, away:2.30 }, live_score:"2 - 1 (Sets)", status:"Live", trend:{home:63,draw:0,away:37} },
-  { id:4, sport:"CS:GO", league:"ESL Pro League", team1:"NAVI", team2:"FaZe",
-    odds:{ home:1.80, draw:null, away:2.05 }, live_score:"12 - 9", status:"Live", trend:{home:55,draw:0,away:45} },
-  { id:5, sport:"League of Legends", league:"LCS Finals", team1:"T1", team2:"G2",
-    odds:{ home:1.55, draw:null, away:2.55 }, live_score:"—", status:"Upcoming 18:30", trend:{home:69,draw:0,away:31} },
-  { id:6, sport:"Football", league:"Premier League", team1:"Arsenal", team2:"Man City",
-    odds:{ home:2.60, draw:3.20, away:2.50 }, live_score:"—", status:"Upcoming 20:00", trend:{home:35,draw:22,away:43} },
-  { id:7, sport:"MMA", league:"UFC 315", team1:"Jones", team2:"Silva",
-    odds:{ home:1.40, draw:null, away:2.95 }, live_score:"Round 2", status:"Live", trend:{home:74,draw:0,away:26} },
-  { id:8, sport:"Baseball", league:"MLB", team1:"Yankees", team2:"Red Sox",
-    odds:{ home:1.90, draw:null, away:1.95 }, live_score:"3 - 2", status:"Live", trend:{home:51,draw:0,away:49} },
-  { id:9, sport:"Valorant", league:"VCT Americas", team1:"Sentinels", team2:"Fnatic",
-    odds:{ home:2.05, draw:null, away:1.78 }, live_score:"—", status:"Upcoming 21:00", trend:{home:47,draw:0,away:53} },
-  { id:10, sport:"Formula 1", league:"F1 Head-to-Head", team1:"Verstappen", team2:"Norris",
-    odds:{ home:1.35, draw:null, away:3.20 }, live_score:"—", status:"Upcoming Sun 14:00", trend:{home:81,draw:0,away:19} },
-];
-
-let sports = [
-  { key:"All", icon:"fa-layer-group" },
-  { key:"Football", icon:"fa-futbol" },
-  { key:"Basketball", icon:"fa-basketball" },
-  { key:"Tennis", icon:"fa-table-tennis-paddle-ball" },
-  { key:"CS:GO", icon:"fa-crosshairs" },
-  { key:"League of Legends", icon:"fa-chess-rook" },
-  { key:"Valorant", icon:"fa-gun" },
-  { key:"MMA", icon:"fa-hand-fist" },
-  { key:"Baseball", icon:"fa-baseball" },
-  { key:"Formula 1", icon:"fa-flag-checkered" },
-];
+/* ---------- 1. CONTENT AND PROVIDER DATA ---------- */
+// Sports markets start empty and are populated only by the connected backend.
+let matches = [];
+let sports = [{ key:"All", icon:"fa-layer-group" }];
 
 // ---------- MULTI-PAGE FILTERING ----------
 // Ace Staker now lives across separate pages (casino.html, sports.html,
 // live.html, esports.html, promotions.html, help.html). Each page's <head>
 // sets `const PAGE_FILTER = "live" | "esports" | undefined;` before this
-// file loads, so the shared mock data can be narrowed to what that page
+// file loads, so provider data can be narrowed to what that page
 // should show — without duplicating the render logic per page.
 if(typeof PAGE_FILTER !== 'undefined'){
   if(PAGE_FILTER === 'live'){
@@ -66,7 +33,7 @@ if(typeof PAGE_FILTER !== 'undefined'){
   }
 }
 
-// Mock betting history for the profile modal
+// Betting history starts empty and is populated from the signed-in account.
 let historyData = [];
 
 const promotions = [
@@ -92,17 +59,15 @@ let state = {
   stake: 0,
   balance: 0,
 
-  // ---- Gamification state ----
-  level: 12,
-  xp: 640,
-  streak: 3,                    // current win streak
+  // ---- Account progression starts neutral until real account data is loaded ----
+  level: 1,
+  xp: 0,
+  streak: 0,
   betsPlaced: 0,
-  wins: 14,
-  losses: 8,
+  wins: 0,
+  losses: 0,
   achievements: new Set(),       // ids of unlocked achievements
 };
-let backendMarketsActive = false;
-
 // XP required to reach the next level scales up each level — simple RPG curve
 function xpToNextLevel(level){ return level * 100; }
 
@@ -136,8 +101,6 @@ const ACHIEVEMENTS = [
   { id:"ace-of-spades", name:"Ace of Spades", desc:"Reach Level 10", icon:"fa-spade",
     check: s => s.level >= 10 },
 ];
-
-let lastBetResult = null; // tracks 'win'/'loss' of the previous resolved bet, powers Comeback Kid
 
 /* ---------- 3. RENDER: SPORT TABS ---------- */
 function renderSportTabs(){
@@ -175,10 +138,18 @@ function renderTicker(extraItems){
       <b>${m.team1} ${m.live_score} ${m.team2}</b> · ${m.league}
     </span>
   `);
-  const winItems = (extraItems || tickerWinCache).map(w => `
+  const winItems = (extraItems || []).map(w => `
     <span class="ticker-item win-item"><i class="fa-solid fa-trophy"></i> ${w}</span>
   `);
   const items = scoreItems.concat(winItems).join('');
+  const shell = track.closest('.ticker-wrap');
+  if(!items){
+    track.innerHTML = '';
+    if(shell) shell.hidden = true;
+    tickerSignature = '';
+    return;
+  }
+  if(shell) shell.hidden = false;
   const signature = `${isHomePage ? 'home' : 'full'}:${items}`;
   if(signature === tickerSignature && track.querySelectorAll('.ticker-group').length === 2) return;
   tickerSignature = signature;
@@ -187,11 +158,6 @@ function renderTicker(extraItems){
   const groupWidth = track.querySelector('.ticker-group')?.scrollWidth || 0;
   track.style.setProperty('--ticker-duration', `${Math.max(36, groupWidth / 80).toFixed(2)}s`);
 }
-let tickerWinCache = [
-  "Alex_K won ₹2,140 on a 4-leg parlay",
-  "MiaBets landed +₹860 on Lakers ML",
-  "DraftKingpin cashed a ₹3,200 UFC underdog",
-];
 
 /* ---------- 3c. RENDER: MATCH LIST + ODDS + TRENDING BAR ---------- */
 function renderMatches(){
@@ -217,8 +183,8 @@ function renderMatches(){
                 <span class="odds-val" id="odds-${m.id}-${pick}">${value.toFixed(2)}</span>
               </button>`;
     };
-    // "Hot" badge — cosmetic gaming touch flagging matches with lopsided crowd trends
-    const isHot = m.trend.home >= 70 || m.trend.away >= 70;
+    const hasTrend = m.trend && Number.isFinite(m.trend.home) && Number.isFinite(m.trend.away);
+    const isHot = hasTrend && (m.trend.home >= 70 || m.trend.away >= 70);
     return `
     <div class="match-card glass" ${matchHref ? `data-match-href="${matchHref}" role="link" tabindex="0" aria-label="View ${m.team1} versus ${m.team2} match details"` : ''}>
       <div class="match-card-top">
@@ -241,7 +207,7 @@ function renderMatches(){
           ${oddsBtn('away','2', m.odds.away)}
         </div>
       </div>
-      <div class="trend-bar-wrap">
+      ${hasTrend ? `<div class="trend-bar-wrap">
         <div class="trend-bar-labels">
           <span><b>${m.trend.home}%</b> ${m.team1}</span>
           ${m.odds.draw !== null ? `<span>${m.trend.draw}% Draw</span>` : ''}
@@ -252,7 +218,7 @@ function renderMatches(){
           ${m.odds.draw !== null ? `<div class="trend-seg-draw" style="width:${m.trend.draw}%"></div>` : ''}
           <div class="trend-seg-away" style="width:${m.trend.away}%"></div>
         </div>
-      </div>
+      </div>` : ''}
     </div>`;
   }).join('');
 
@@ -531,50 +497,6 @@ if(document.getElementById('betslip')){
       updatePotentialReturn();
     }
   });
-}
-
-/*
- * BET RESOLUTION SIMULATION
- * --------------------------
- * Implied win probability is derived from the combined decimal odds
- * (1 / combinedOdds), then a weighted coin-flip decides the outcome —
- * mirroring how a real settlement engine would resolve a wager, just
- * compressed into a couple seconds for the demo.
- */
-function resolveBet(stake, betType, legCount){
-  const combined = betType === 'parlay' ? Math.max(1.01, calcCombinedOdds() || 2) : 1.9;
-  const impliedProb = 1 / combined;
-  const won = Math.random() < impliedProb;
-  const boostPct = betType === 'parlay' ? getComboBoostPct(legCount) : 0;
-  const payout = won ? stake * combined * (1 + boostPct) : 0;
-  const profit = won ? payout - stake : -stake;
-
-  if(won){
-    state.balance += payout;
-    state.wins++;
-    state.streak++;
-    awardXP(25 + state.streak * 5, { comeback: lastBetResult === 'loss' });
-    showToast(`🎉 You won ₹${payout.toFixed(2)}!`);
-    spawnWinFeedItem(`you just won ₹${payout.toFixed(2)} on a ${legCount>1?legCount+'-leg parlay':'single bet'}!`);
-    if(state.streak > 0 && state.streak % 3 === 0) fireConfetti();
-  } else {
-    state.balance += 0; // stake already deducted at placement
-    state.losses++;
-    state.streak = 0;
-    showToast(`Bet settled: no win this time.`, true);
-  }
-  lastBetResult = won ? 'win' : 'loss';
-
-  historyData.unshift({
-    date:new Date().toISOString().slice(0,10),
-    event: legCount>1 ? `${legCount}-Leg Parlay` : 'Single Bet',
-    stake, result: won ? 'Win':'Loss', pl: Math.round(profit*100)/100
-  });
-
-  updateBalanceDisplay();
-  updateProgressUI();
-  renderHistory();
-  checkAchievements();
 }
 
 function updateBalanceDisplay(){
@@ -900,83 +822,8 @@ if(casinoSearchInputEl){ // only present on casino.html
   });
 }
 
-/* ---------- 6. SIMULATED LIVE UPDATES ---------- */
-
-// Ticker scores update every 5s (simulated "API call")
-setInterval(()=>{
-  if(backendMarketsActive) return;
-  matches.forEach(m=>{
-    if(m.status !== 'Live') return;
-    if(m.sport === 'Basketball' || m.sport === 'CS:GO' || m.sport === 'Baseball'){
-      const parts = m.live_score.split(' - ').map(Number);
-      if(parts.length === 2 && !isNaN(parts[0])){
-        m.live_score = `${parts[0] + Math.floor(Math.random()*3)} - ${parts[1] + Math.floor(Math.random()*3)}`;
-      }
-    }
-  });
-  renderTicker();
-  renderMatches();
-}, 5000);
-
-// Simulated live odds fluctuation every 4s — mimics a real sportsbook feed
-setInterval(()=>{
-  if(backendMarketsActive) return;
-  const spinner = document.getElementById('oddsSpinner');
-  if(spinner) spinner.style.display = 'inline-block'; // only present on sports/live/esports pages
-  setTimeout(()=>{ // fake network latency
-    matches.forEach(m=>{
-      ['home','draw','away'].forEach(key=>{
-        if(m.odds[key] === null) return;
-        const delta = (Math.random() - 0.5) * 0.1; // small drift
-        let newVal = Math.max(1.05, m.odds[key] + delta);
-        newVal = Math.round(newVal * 100) / 100;
-        const el = document.getElementById(`odds-${m.id}-${key}`);
-        if(el && newVal !== m.odds[key]){
-          const btn = el.closest('.odds-btn');
-          btn.classList.remove('flash-up','flash-down');
-          void btn.offsetWidth; // restart animation
-          btn.classList.add(newVal > m.odds[key] ? 'flash-up' : 'flash-down');
-        }
-        m.odds[key] = newVal;
-        // Keep any active selections' displayed odds in sync
-        const sel = state.selections.find(s => s.matchId === m.id && s.pick === key);
-        if(sel) sel.odds = newVal;
-      });
-      // Trending crowd % also drifts slightly, keeping the "vote meter" alive
-      if(m.trend.draw > 0){
-        let h = Math.min(90, Math.max(10, m.trend.home + Math.round((Math.random()-0.5)*6)));
-        let d = Math.min(40, Math.max(5, m.trend.draw + Math.round((Math.random()-0.5)*3)));
-        m.trend.home = h; m.trend.draw = d; m.trend.away = 100 - h - d;
-      } else {
-        let h = Math.min(92, Math.max(8, m.trend.home + Math.round((Math.random()-0.5)*6)));
-        m.trend.home = h; m.trend.away = 100 - h;
-      }
-    });
-    renderMatches();
-    renderSlip();
-    const refreshLabel = document.getElementById('refreshLabel');
-    if(refreshLabel) refreshLabel.textContent = 'Live odds updated just now';
-  }, 500);
-}, 4000);
-
-// Simulated "Big Win" social-proof feed — other bettors winning around the site
-const winFeedNames = ["Alex_K","MiaBets","DraftKingpin","ClutchQueen","VegasVortex","ParlayPete","Nova_88","BankrollBaron"];
-function spawnWinFeedItem(customText){
-  const stack = document.getElementById('winfeedStack');
-  const el = document.createElement('div');
-  el.className = 'winfeed-item glass';
-  const text = customText || `${winFeedNames[Math.floor(Math.random()*winFeedNames.length)]} just won ₹${(Math.floor(Math.random()*3000)+80).toLocaleString('en-IN')} on ${matches[Math.floor(Math.random()*matches.length)].team1}!`;
-  el.innerHTML = `<i class="fa-solid fa-trophy"></i> <span>${text}</span>`;
-  stack.appendChild(el);
-  setTimeout(()=> el.remove(), 4700);
-}
-setInterval(()=>{
-  if(backendMarketsActive) return;
-  spawnWinFeedItem();
-  tickerWinCache.push(`${winFeedNames[Math.floor(Math.random()*winFeedNames.length)]} landed a big win`);
-  if(tickerWinCache.length > 6) tickerWinCache.shift();
-  renderTicker();
-}, 9000);
+/* ---------- 6. PROVIDER-BACKED MARKET REFRESH ---------- */
+// Market, score, and odds updates are supplied by the backend integration.
 
 /* ---------- 7. EXTRA CONTENT: Promotions / FAQ ---------- */
 
@@ -1166,7 +1013,7 @@ init();
 /* =========================================================
    LIVE SCOREBOARD — Home page only. Compact, horizontally
    scrollable strip of score cards pulled from the shared `matches`
-   mock data — Live matches surfaced first, then Upcoming. Guarded
+   provider data — Live matches surfaced first, then Upcoming. Guarded
    so it's a no-op on every other page (none of them have
    #homeScoreboard). Each card links straight into Live/Sports.
    ========================================================= */
@@ -1246,7 +1093,6 @@ window.AceUI = {
     });
     matches = nextMatches;
     sports = nextSports;
-    backendMarketsActive = true;
     if(!sports.some(sport => sport.key === state.activeSport)) state.activeSport = 'All';
     state.selections = state.selections.flatMap(selection => {
       const match = matches.find(item => item.selectionIds?.[selection.pick] === selection.selectionId);
