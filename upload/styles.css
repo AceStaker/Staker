@@ -1441,7 +1441,7 @@ table.history td{ padding:9px 8px; border-bottom:1px solid rgba(255,255,255,.05)
   .main-content{ padding:18px 14px; }
   .home-casino-banner{
     min-height:460px; padding:27px 22px; border-radius:17px; align-items:end;
-    background-position:100% center;
+    background-position:calc(100% + 24px) center;
     background-image:
       linear-gradient(180deg,rgba(8,4,2,.08) 0%,rgba(8,4,2,.42) 35%,rgba(8,4,2,.97) 100%),
       url('ace-casino-gold-hero-hd.webp');
@@ -1453,9 +1453,9 @@ table.history td{ padding:9px 8px; border-bottom:1px solid rgba(255,255,255,.05)
   .home-aviator-copy{ width:100%; }
   .home-aviator-copy h2{ font-size:2.45rem; }
   .home-aviator-copy p{ max-width:88%; margin:12px 0 17px; }
-  .home-aviator-atmosphere img{ width:112%; max-width:none; top:31%; right:-30%; }
+  .home-aviator-atmosphere img{ width:98%; max-width:none; top:31%; right:1%; }
   .aviator-banner-moon{ top:23px; right:18px; width:52px; }
-  .aviator-banner-trail{ top:34%; right:56%; width:50%; }
+  .aviator-banner-trail{ top:34%; right:64%; width:36%; }
   .home-aviator-badge{ top:16px; left:16px; right:auto; }
   .home-section-head{ align-items:flex-start; flex-direction:column; gap:6px; }
   .home-section-head p{ text-align:left; }
