@@ -610,29 +610,20 @@
 }
 .crossing-player{
   left:50%;
-  bottom:12%;
-  width:92px;
-  height:92px;
+  bottom:10%;
+  width:112px;
+  height:22px;
   border:0;
-  color:#3a2200;
-  background:
-    radial-gradient(circle at 38% 30%,#fff7b7 0 4%,transparent 5%),
-    radial-gradient(circle at 50% 42%,#ffd65a 0 30%,#f3a518 62%,#bf6810 100%);
-  box-shadow:0 22px 28px rgba(0,0,0,.42),inset 0 3px rgba(255,255,255,.48),0 0 42px rgba(255,206,47,.5);
-  font-size:2rem;
+  border-radius:50%;
+  color:transparent;
+  background:radial-gradient(ellipse,rgba(255,228,92,.68),rgba(255,184,35,.16) 48%,transparent 72%);
+  box-shadow:0 0 28px rgba(255,210,58,.35);
+  font-size:0;
 }
 .crossing-player::before,.crossing-player::after{
-  content:"";
-  position:absolute;
-  top:47%;
-  width:32px;
-  height:18px;
-  border-radius:70% 20% 70% 30%;
-  background:#e89c19;
+  display:none;
 }
-.crossing-player::before{ left:-15px; transform:rotate(23deg); }
-.crossing-player::after{ right:-15px; transform:scaleX(-1) rotate(23deg); }
-.crossing-player i{ color:#ffef76; filter:drop-shadow(0 2px #a8540d); transform:translateY(-36px); }
+.crossing-player i{ display:none; }
 .crossing-player.hop{ animation:chickenHop .42s cubic-bezier(.2,.8,.3,1); }
 
 /* Mines — crystalline vault */
@@ -895,8 +886,7 @@
   .game-result strong{ margin:0 0 0 10px; font-size:3.2rem; }
   .game-result button{ margin-top:12px; }
   .crossing-cinema{ background-position:51% center; }
-  .crossing-player{ width:72px; height:72px; bottom:10%; }
-  .crossing-player i{ transform:translateY(-28px); }
+  .crossing-player{ width:96px; height:18px; bottom:9%; }
   .mines-grid{ gap:6px; padding:12px; border-radius:17px; }
   .mine-cell small{ display:none; }
   .plinko-board{ border-radius:20px; }
