@@ -42,6 +42,19 @@ body{
   transition:background .3s ease, color .3s ease;
   overflow-x:hidden;
 }
+body::before{
+  content:'';
+  position:fixed;
+  inset:0;
+  z-index:-1;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 12% 15%, rgba(155,93,229,.32), transparent 42%),
+    radial-gradient(circle at 88% 10%, rgba(212,175,55,.26), transparent 38%),
+    radial-gradient(circle at 50% 100%, rgba(200,16,46,.28), transparent 48%),
+    radial-gradient(circle at 78% 55%, rgba(31,164,99,.16), transparent 40%);
+  animation:siteGlowPulse 14s ease-in-out infinite alternate;
+}
 a{ color:inherit; text-decoration:none; }
 button{ font-family:inherit; cursor:pointer; border:none; }
 button:disabled{ cursor:not-allowed; opacity:.55; }
@@ -279,14 +292,9 @@ body.light-mode .header{ background:rgba(255,255,255,0.75); }
 /* =========================================================
    OPERATIONS — dedicated full-page administrator workspace
    ========================================================= */
-.operations-page{ min-height:100vh; background:#080a0f; }
+.operations-page{ min-height:100vh; background-color:var(--bg-main); }
 .operations-page::after{ display:none; }
-.operations-bg{
-  position:fixed; inset:0; pointer-events:none;
-  background:
-    radial-gradient(circle at 18% 8%,rgba(212,175,55,.08),transparent 30%),
-    radial-gradient(circle at 88% 15%,rgba(155,93,229,.08),transparent 28%);
-}
+.operations-bg{ display:none; }
 .operations-header{
   position:sticky; top:0; z-index:100; min-height:72px;
   border-bottom:1px solid rgba(255,255,255,.07);
@@ -545,6 +553,7 @@ body::after{
 @keyframes pulseDot{ 0%,100%{ opacity:1;} 50%{ opacity:.3; } }
 @media (prefers-reduced-motion:reduce){
   .ticker{ animation-play-state:paused; }
+  body::before{ animation:none; }
 }
 
 /* =========================================================
@@ -989,20 +998,9 @@ body::after{
 .quicklink-card .quicklink-cta i{ font-size:.72rem; transition:transform .2s; }
 .quicklink-card:hover .quicklink-cta i{ transform:translateX(3px); }
 
-/* Neon ambient background — Home page only. A fixed, blurred blend of the
-   brand's gold/purple/crimson/green glows behind the content (z-index -1,
-   pointer-events none) plus a subtle animated pulse, so Home reads as a
-   glowing "gaming lobby" without touching the layout of any element. */
-.home-glow-bg{
-  position:fixed; inset:0; z-index:-1; pointer-events:none;
-  background:
-    radial-gradient(circle at 12% 15%, rgba(155,93,229,.32), transparent 42%),
-    radial-gradient(circle at 88% 10%, rgba(212,175,55,.26), transparent 38%),
-    radial-gradient(circle at 50% 100%, rgba(200,16,46,.28), transparent 48%),
-    radial-gradient(circle at 78% 55%, rgba(31,164,99,.16), transparent 40%);
-  animation: homeGlowPulse 14s ease-in-out infinite alternate;
-}
-@keyframes homeGlowPulse{
+/* The home lobby's ambient glow is now supplied globally by body::before. */
+.home-glow-bg{ display:none; }
+@keyframes siteGlowPulse{
   0%{ filter:brightness(1) saturate(1); }
   100%{ filter:brightness(1.18) saturate(1.3); }
 }
