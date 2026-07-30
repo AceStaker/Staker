@@ -536,7 +536,7 @@
 
 .active-ticket{
   display:grid;
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:1fr;
   gap:8px;
   padding:12px;
   margin-bottom:17px;
@@ -545,7 +545,6 @@
   background:linear-gradient(120deg,rgba(71,232,255,.08),rgba(119,63,197,.09));
 }
 .active-ticket>div{ display:grid; gap:2px; }
-.active-ticket>div:last-child{ text-align:right; }
 .active-ticket span{ color:#777c89; font-size:.6rem; font-weight:800; letter-spacing:.08em; }
 .active-ticket strong{ color:#e8fbff; font:800 1rem var(--font-display); }
 
@@ -604,63 +603,6 @@
   cursor:pointer;
 }
 .stake-chips button:hover{ color:#fff; border-color:rgba(255,98,125,.25); background:rgba(255,49,88,.07); }
-
-.auto-row{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  padding:14px 0;
-  border-top:1px solid rgba(255,255,255,.065);
-  border-bottom:1px solid rgba(255,255,255,.065);
-}
-.auto-toggle{ display:flex; align-items:center; gap:10px; cursor:pointer; }
-.auto-toggle input{ position:absolute; opacity:0; pointer-events:none; }
-.auto-switch{
-  position:relative;
-  flex:0 0 auto;
-  width:40px;
-  height:22px;
-  border-radius:99px;
-  background:#34313b;
-  transition:.2s;
-}
-.auto-switch::after{
-  content:"";
-  position:absolute;
-  width:16px;
-  height:16px;
-  left:3px;
-  top:3px;
-  border-radius:50%;
-  background:#898490;
-  transition:.2s;
-}
-.auto-toggle input:checked+.auto-switch{ background:linear-gradient(90deg,#ff3158,#ff7543); }
-.auto-toggle input:checked+.auto-switch::after{ left:21px; background:#fff; }
-.auto-toggle>span:last-child{ display:grid; gap:2px; }
-.auto-toggle b{ font-size:.76rem; }
-.auto-toggle small{ color:#6f6a77; font-size:.61rem; }
-.auto-value{
-  display:flex;
-  align-items:center;
-  width:91px;
-  height:40px;
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:9px;
-  background:rgba(0,0,0,.18);
-}
-.auto-value input{
-  width:100%;
-  border:0;
-  outline:0;
-  padding-left:10px;
-  background:transparent;
-  color:#fff;
-  font:800 .92rem var(--font-display);
-}
-.auto-value span{ padding-right:9px; color:#ff748d; font-weight:800; }
-.auto-value:has(input:disabled){ opacity:.4; }
 
 .potential-row{
   display:flex;
@@ -955,7 +897,6 @@
   .console-head{ margin-bottom:16px; }
   .stake-control{ height:58px; }
   .stake-control input{ font-size:1.65rem; }
-  .auto-toggle small{ display:none; }
   .potential-row{ margin-top:15px; }
   .flight-action{ min-height:68px; border-radius:13px; }
   .fairness-card,.my-flights-card{ min-height:0; padding:17px; border-radius:14px; }

@@ -28,8 +28,7 @@
       'countdownValue', 'multiplierValue', 'flightMessage', 'playerCount',
       'roundPool', 'roundHistory', 'flightAction', 'actionEyebrow',
       'actionLabel', 'consoleNote', 'aviatorStake', 'stakeChips',
-      'autoCashToggle', 'autoCashValue', 'potentialMultiplier',
-      'potentialReturn', 'activeTicket', 'ticketStake', 'ticketAuto',
+      'potentialMultiplier', 'potentialReturn', 'activeTicket', 'ticketStake',
       'myFlights', 'flightLogStatus', 'soundToggle'
     ].forEach(id => { els[id] = document.getElementById(id); });
   }
@@ -149,7 +148,6 @@
     els.activeTicket.hidden = !bet;
     if (!bet) return;
     els.ticketStake.textContent = money(bet.stake);
-    els.ticketAuto.textContent = bet.auto_cashout ? `${Number(bet.auto_cashout).toFixed(2)}×` : 'Off';
   }
 
   function renderMyFlights(history) {
@@ -190,8 +188,6 @@
     const stake = validStake();
 
     els.aviatorStake.disabled = !signedIn || Boolean(bet);
-    els.autoCashToggle.disabled = !signedIn || Boolean(bet);
-    els.autoCashValue.disabled = !signedIn || Boolean(bet) || !els.autoCashToggle.checked;
     els.stakeChips.querySelectorAll('button').forEach(button => { button.disabled = !signedIn || Boolean(bet); });
 
     els.flightAction.disabled = actionPending;
@@ -373,9 +369,7 @@
 
   function updatePotential() {
     const stake = validStake();
-    const multiplier = els.autoCashToggle.checked
-      ? Math.max(1.1, Number(els.autoCashValue.value) || 2)
-      : 2;
+    const multiplier = 2;
     els.potentialMultiplier.textContent = `${multiplier.toFixed(2)}×`;
     els.potentialReturn.textContent = money(stake * multiplier);
     renderControls();
@@ -404,12 +398,9 @@
       } else if (!bet && round.status === 'waiting') {
         const stake = validStake();
         if (!stake) throw new Error('Enter a stake between ₹10 and ₹1,00,000.');
-        const autoCashout = els.autoCashToggle.checked
-          ? Math.round(Number(els.autoCashValue.value) * 100) / 100
-          : null;
         const { error } = await backend.client.rpc('aviator_place_bet', {
           p_stake: stake,
-          p_auto_cashout: autoCashout
+          p_auto_cashout: null
         });
         if (error) throw error;
         tone(660, .12, .04);
@@ -427,11 +418,6 @@
   function bindEvents() {
     els.flightAction.addEventListener('click', handleAction);
     els.aviatorStake.addEventListener('input', updatePotential);
-    els.autoCashValue.addEventListener('input', updatePotential);
-    els.autoCashToggle.addEventListener('change', () => {
-      els.autoCashValue.disabled = !els.autoCashToggle.checked || Boolean(snapshot?.my_bet);
-      updatePotential();
-    });
     els.stakeChips.addEventListener('click', event => {
       const button = event.target.closest('[data-stake]');
       if (!button) return;
