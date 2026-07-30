@@ -87,7 +87,7 @@ body.light-mode .header{ background:rgba(255,255,255,0.75); }
 .logo i{ color:var(--gold); font-size:1.5rem; text-shadow:0 0 12px rgba(212,175,55,.6); }
 .logo span{ background:linear-gradient(120deg,var(--gold),var(--gold-bright)); -webkit-background-clip:text; background-clip:text; color:transparent; }
 
-.nav-links{ display:flex; gap:28px; list-style:none; }
+.nav-links{ display:flex; gap:22px; list-style:none; }
 .nav-links a{
   font-weight:600; font-size:.92rem; color:var(--text-dim);
   position:relative; padding:6px 0; transition:color .2s;

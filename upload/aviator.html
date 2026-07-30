@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Ace Aviator is a server-validated crash game played with demonstration credits only.">
+<title>Ace Staker | Aviator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="feature-styles.css">
+<link rel="stylesheet" href="aviator.css">
+</head>
+<body class="aviator-page">
+
+<canvas id="confettiCanvas"></canvas>
+
+<header class="header">
+  <a href="home.html" class="logo" style="text-decoration:none;">
+    <i class="fa-solid fa-spade"></i>
+    <span>Ace Staker</span>
+  </a>
+
+  <nav>
+    <ul class="nav-links">
+      <li><a href="casino.html" data-nav="casino">Casino</a></li>
+      <li><a href="aviator.html" class="active aviator-nav-link" data-nav="aviator"><i class="fa-solid fa-plane-up"></i> Aviator</a></li>
+      <li><a href="sports.html" data-nav="sports">Sports</a></li>
+      <li><a href="live.html" data-nav="live">Live</a></li>
+      <li><a href="esports.html" data-nav="esports">Esports</a></li>
+      <li><a href="promotions.html" data-nav="promotions">Promotions</a></li>
+      <li><a href="help.html" data-nav="help">Help</a></li>
+    </ul>
+  </nav>
+
+  <div class="header-right">
+    <div class="balance-pill" id="balancePill">
+      <i class="fa-solid fa-coins"></i>
+      <span class="balance-text" id="balanceText">₹0.00</span>
+    </div>
+
+    <div class="avatar-wrap">
+      <div class="avatar" id="avatarBtn">GU<span class="avatar-level" id="avatarLevel">1</span></div>
+      <div class="dropdown glass" id="userDropdown">
+        <a href="#" id="profileBtn"><i class="fa-solid fa-user"></i> My Profile</a>
+        <a href="#" id="historyBtn"><i class="fa-solid fa-clock-rotate-left"></i> Betting History</a>
+        <a href="#"><i class="fa-solid fa-wallet"></i> Deposit / Withdraw</a>
+        <hr>
+        <a href="#"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="#"><i class="fa-solid fa-user-plus"></i> Register</a>
+        <hr>
+        <button><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</button>
+      </div>
+    </div>
+
+    <button class="mobile-nav-toggle" aria-label="Open navigation"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<main class="aviator-main">
+  <section class="aviator-intro">
+    <div>
+      <span class="aviator-kicker"><i class="fa-solid fa-bolt"></i> LIVE CRASH GAME</span>
+      <h1>ACE <span>AVIATOR</span></h1>
+      <p>Board the flight, watch the multiplier climb, and cash out before it disappears.</p>
+    </div>
+    <div class="aviator-trust">
+      <span><i class="fa-solid fa-shield-halved"></i> Server validated</span>
+      <span><i class="fa-solid fa-fingerprint"></i> Provably fair</span>
+      <button type="button" id="soundToggle" aria-pressed="false"><i class="fa-solid fa-volume-xmark"></i> Sound</button>
+    </div>
+  </section>
+
+  <section class="round-history glass" aria-label="Recent crash multipliers">
+    <div class="round-history-label">
+      <i class="fa-solid fa-clock-rotate-left"></i>
+      <span>Recent flights</span>
+    </div>
+    <div class="round-history-list" id="roundHistory">
+      <span class="history-skeleton"></span>
+      <span class="history-skeleton"></span>
+      <span class="history-skeleton"></span>
+    </div>
+  </section>
+
+  <div class="aviator-grid">
+    <section class="flight-stage glass" id="flightStage">
+      <div class="stage-topline">
+        <span class="round-code">ROUND <b id="roundCode">—</b></span>
+        <span class="round-status waiting" id="roundStatus"><i class="fa-solid fa-circle"></i> Connecting</span>
+      </div>
+
+      <div class="sky-layer" aria-hidden="true">
+        <span class="cloud cloud-one"></span>
+        <span class="cloud cloud-two"></span>
+        <span class="cloud cloud-three"></span>
+      </div>
+      <canvas id="flightCanvas" aria-hidden="true"></canvas>
+
+      <div class="flight-readout" aria-live="polite">
+        <div class="countdown-orbit" id="countdownOrbit">
+          <span id="countdownValue">—</span>
+        </div>
+        <div class="multiplier" id="multiplierValue">1.00<span>×</span></div>
+        <div class="flight-message" id="flightMessage">Preparing the runway</div>
+      </div>
+
+      <div class="plane-wrap" id="planeWrap" aria-hidden="true">
+        <span class="engine-flare"></span>
+        <i class="fa-solid fa-plane-up"></i>
+      </div>
+
+      <div class="stage-metrics">
+        <div><i class="fa-solid fa-users"></i><span><b id="playerCount">0</b> pilots</span></div>
+        <div><i class="fa-solid fa-coins"></i><span><b id="roundPool">₹0</b> onboard</span></div>
+        <div><i class="fa-solid fa-signal"></i><span><b>Live</b> sync</span></div>
+      </div>
+    </section>
+
+    <aside class="flight-console glass">
+      <div class="console-head">
+        <div>
+          <span>FLIGHT CONTROL</span>
+          <h2>Place your demo stake</h2>
+        </div>
+        <i class="fa-solid fa-sliders"></i>
+      </div>
+
+      <div class="active-ticket" id="activeTicket" hidden>
+        <div>
+          <span>YOUR TICKET</span>
+          <strong id="ticketStake">₹0.00</strong>
+        </div>
+        <div>
+          <span>AUTO CASH-OUT</span>
+          <strong id="ticketAuto">Off</strong>
+        </div>
+      </div>
+
+      <label class="control-label" for="aviatorStake">
+        <span>Stake amount</span>
+        <span>Demo credits</span>
+      </label>
+      <div class="stake-control">
+        <span>₹</span>
+        <input id="aviatorStake" type="number" min="10" max="100000" step="10" value="100" inputmode="decimal">
+      </div>
+      <div class="stake-chips" id="stakeChips">
+        <button type="button" data-stake="100">₹100</button>
+        <button type="button" data-stake="500">₹500</button>
+        <button type="button" data-stake="1000">₹1K</button>
+        <button type="button" data-stake="5000">₹5K</button>
+      </div>
+
+      <div class="auto-row">
+        <label class="auto-toggle">
+          <input type="checkbox" id="autoCashToggle">
+          <span class="auto-switch"></span>
+          <span>
+            <b>Auto cash-out</b>
+            <small>Protect your flight automatically</small>
+          </span>
+        </label>
+        <div class="auto-value">
+          <input id="autoCashValue" type="number" min="1.10" max="1000" step="0.10" value="2.00" disabled>
+          <span>×</span>
+        </div>
+      </div>
+
+      <div class="potential-row">
+        <span>Potential at <b id="potentialMultiplier">2.00×</b></span>
+        <strong id="potentialReturn">₹200.00</strong>
+      </div>
+
+      <button class="flight-action board" id="flightAction" type="button">
+        <span class="action-icon"><i class="fa-solid fa-plane-departure"></i></span>
+        <span>
+          <small id="actionEyebrow">NEXT FLIGHT</small>
+          <b id="actionLabel">BOARD FOR ₹100.00</b>
+        </span>
+      </button>
+
+      <p class="console-note" id="consoleNote">
+        <i class="fa-solid fa-circle-info"></i>
+        Sign in to place a demo-credit wager. No real money or prizes.
+      </p>
+    </aside>
+  </div>
+
+  <section class="aviator-lower-grid">
+    <div class="fairness-card glass">
+      <div class="panel-heading">
+        <div>
+          <span>VERIFIABLE ROUND</span>
+          <h3><i class="fa-solid fa-fingerprint"></i> Provably fair</h3>
+        </div>
+        <div class="fairness-actions">
+          <button type="button" id="copySeedHash" aria-label="Copy seed commitment"><i class="fa-regular fa-copy"></i></button>
+          <button type="button" id="verifyLastRound"><i class="fa-solid fa-check-double"></i> Verify last round</button>
+        </div>
+      </div>
+      <p>The server commits to a hidden seed before takeoff. It reveals that seed after the crash so the round cannot be changed mid-flight.</p>
+      <div class="seed-line">
+        <span>SHA-256 commitment</span>
+        <code id="seedHash">Waiting for round…</code>
+      </div>
+      <div class="seed-line reveal" id="seedRevealRow" hidden>
+        <span>Revealed server seed</span>
+        <code id="seedReveal">—</code>
+      </div>
+      <p class="verification-result" id="verificationResult" hidden></p>
+    </div>
+
+    <div class="my-flights-card glass">
+      <div class="panel-heading">
+        <div>
+          <span>PERSONAL LOGBOOK</span>
+          <h3><i class="fa-solid fa-route"></i> My recent flights</h3>
+        </div>
+        <span class="flight-log-status" id="flightLogStatus">Sign in required</span>
+      </div>
+      <div class="my-flights-list" id="myFlights">
+        <div class="flight-empty"><i class="fa-solid fa-ticket"></i><span>Your completed flights will appear here.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="aviator-rules glass">
+    <div><i class="fa-solid fa-1"></i><span><b>Choose a stake</b>Join while the runway countdown is active.</span></div>
+    <div><i class="fa-solid fa-2"></i><span><b>Watch it climb</b>The multiplier rises until the hidden crash point.</span></div>
+    <div><i class="fa-solid fa-3"></i><span><b>Cash out in time</b>Your server-verified payout is credited instantly.</span></div>
+    <a href="responsible-play.html"><i class="fa-solid fa-shield-heart"></i> Responsible play</a>
+  </section>
+
+  <div class="aviator-disclaimer">
+    <strong>DEMO · NO REAL MONEY</strong>
+    <span>Entertainment simulation for adults 18+. Outcomes use demonstration credits with no cash value.</span>
+  </div>
+</main>
+
+<div class="modal-overlay" id="historyModal">
+  <div class="modal glass">
+    <div class="modal-header">
+      <h2><i class="fa-solid fa-user-tie"></i> My Profile</h2>
+      <button class="modal-close" id="closeModal"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-box"><div class="val" id="modalBalance">₹0.00</div><div class="lbl">Current Balance</div></div>
+    </div>
+    <div class="achv-grid" id="achvGrid"></div>
+    <table class="history">
+      <thead><tr><th>Date</th><th>Event</th><th>Stake</th><th>Result</th><th>P/L</th></tr></thead>
+      <tbody id="historyTableBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i class="fa-solid fa-check-circle"></i> <span id="toastMsg">Ready</span></div>
+<div class="achieve-toast" id="achieveToast">
+  <i class="fa-solid fa-trophy trophy"></i>
+  <div><div class="a-title">Achievement Unlocked</div><div class="a-name" id="achieveName"></div><div class="a-desc" id="achieveDesc"></div></div>
+</div>
+<div class="winfeed-stack" id="winfeedStack"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
+<script src="supabase-app.js"></script>
+<script src="platform-features.js"></script>
+<script src="aviator.js"></script>
+</body>
+</html>

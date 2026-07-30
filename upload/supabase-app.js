@@ -19,6 +19,7 @@
   const marketUiIds = new Map();
   let nextMarketUiId = 1000;
   const operationsPage = document.body.classList.contains('operations-page');
+  const aviatorPage = document.body.classList.contains('aviator-page');
 
   const money = value => `₹${Number(value || 0).toLocaleString('en-IN', {
     minimumFractionDigits: 2,
@@ -582,6 +583,11 @@
         detail: { user: null, profile: null, isAdmin: false }
       }));
       return;
+    }
+
+    const { error: aviatorSyncError } = await client.rpc('aviator_sync');
+    if (aviatorSyncError && aviatorSyncError.code !== 'PGRST202') {
+      console.warn('Aviator settlement sync failed:', aviatorSyncError.message);
     }
 
     const [{ data: profile }, { data: wallet }, { data: isAdmin, error: adminError }] = await Promise.all([
@@ -1414,7 +1420,7 @@
     client.auth.onAuthStateChange((_event, nextSession) => {
       setTimeout(() => applySession(nextSession), 0);
     });
-    if (!operationsPage && !document.getElementById('matchDetailRoot')) {
+    if (!operationsPage && !aviatorPage && !document.getElementById('matchDetailRoot')) {
       await loadMarkets();
       startPublicMarketsRefresh();
     }
