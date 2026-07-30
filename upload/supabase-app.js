@@ -20,6 +20,8 @@
   let nextMarketUiId = 1000;
   const operationsPage = document.body.classList.contains('operations-page');
   const aviatorPage = document.body.classList.contains('aviator-page');
+  const originalsPage = document.body.classList.contains('games-page')
+    || document.body.classList.contains('instant-page');
 
   const money = value => `₹${Number(value || 0).toLocaleString('en-IN', {
     minimumFractionDigits: 2,
@@ -1420,7 +1422,7 @@
     client.auth.onAuthStateChange((_event, nextSession) => {
       setTimeout(() => applySession(nextSession), 0);
     });
-    if (!operationsPage && !aviatorPage && !document.getElementById('matchDetailRoot')) {
+    if (!operationsPage && !aviatorPage && !originalsPage && !document.getElementById('matchDetailRoot')) {
       await loadMarkets();
       startPublicMarketsRefresh();
     }

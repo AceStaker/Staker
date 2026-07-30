@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Play Ace Staker original demo-credit instant games.">
+<title>Ace Staker | Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="feature-styles.css">
+<link rel="stylesheet" href="games.css">
+</head>
+<body class="instant-page" data-game="crossing">
+<canvas id="confettiCanvas"></canvas>
+<header class="header">
+  <a href="home.html" class="logo" style="text-decoration:none;"><i class="fa-solid fa-spade"></i><span>Ace Staker</span></a>
+  <nav>
+    <ul class="nav-links">
+      <li><a href="casino.html" data-nav="casino">Casino</a></li>
+      <li><a href="games.html" class="active" data-nav="games">Games</a></li>
+      <li><a href="sports.html" data-nav="sports">Sports</a></li>
+      <li><a href="live.html" data-nav="live">Live</a></li>
+      <li><a href="esports.html" data-nav="esports">Esports</a></li>
+      <li><a href="promotions.html" data-nav="promotions">Promotions</a></li>
+      <li><a href="help.html" data-nav="help">Help</a></li>
+    </ul>
+  </nav>
+  <div class="header-right">
+    <div class="balance-pill" id="balancePill"><i class="fa-solid fa-coins"></i><span class="balance-text" id="balanceText">₹0.00</span></div>
+    <div class="avatar-wrap">
+      <div class="avatar" id="avatarBtn">GU<span class="avatar-level" id="avatarLevel">1</span></div>
+      <div class="dropdown glass" id="userDropdown">
+        <a href="#" id="profileBtn"><i class="fa-solid fa-user"></i> My Profile</a>
+        <a href="#" id="historyBtn"><i class="fa-solid fa-clock-rotate-left"></i> Betting History</a>
+        <a href="#"><i class="fa-solid fa-wallet"></i> Deposit / Withdraw</a><hr>
+        <a href="#"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="#"><i class="fa-solid fa-user-plus"></i> Register</a><hr>
+        <button><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</button>
+      </div>
+    </div>
+    <button class="mobile-nav-toggle" aria-label="Open navigation"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<main class="instant-main">
+  <a class="back-to-games" href="games.html"><i class="fa-solid fa-arrow-left"></i> All games</a>
+  <section class="instant-title">
+    <div>
+      <span class="instant-kicker" id="gameKicker">ACE ORIGINAL</span>
+      <h1 id="gameTitle">Lucky Crossing</h1>
+      <p id="gameSubtitle">Every safe move raises the multiplier.</p>
+    </div>
+    <div class="instant-badges"><span><i class="fa-solid fa-server"></i> Server outcome</span><span><i class="fa-solid fa-shield-halved"></i> 96% demo RTP</span></div>
+  </section>
+
+  <div class="instant-layout">
+    <section class="game-stage glass" id="gameStage" aria-live="polite">
+      <div class="stage-ambient"></div>
+      <div class="game-scene" id="gameScene"></div>
+      <div class="game-result" id="gameResult" hidden>
+        <span id="resultEyebrow">ROUND COMPLETE</span>
+        <strong id="resultValue">1.00×</strong>
+        <p id="resultMessage">Ready for another round.</p>
+      </div>
+    </section>
+
+    <aside class="game-console glass">
+      <div class="game-console-head">
+        <div><span>GAME CONTROL</span><h2 id="consoleTitle">Start a crossing</h2></div>
+        <i id="consoleIcon" class="fa-solid fa-gamepad"></i>
+      </div>
+      <div id="gameOptions" class="game-options"></div>
+      <label class="control-label" for="gameStake"><span>Stake amount</span><span>Demo credits</span></label>
+      <div class="instant-stake">
+        <button type="button" id="stakeMinus" aria-label="Decrease stake"><i class="fa-solid fa-minus"></i></button>
+        <span>₹</span>
+        <input id="gameStake" type="number" min="10" max="100000" step="10" value="100" inputmode="decimal">
+        <button type="button" id="stakePlus" aria-label="Increase stake"><i class="fa-solid fa-plus"></i></button>
+      </div>
+      <div class="instant-chips" id="instantChips">
+        <button type="button" data-stake="100">₹100</button>
+        <button type="button" data-stake="500">₹500</button>
+        <button type="button" data-stake="1000">₹1K</button>
+        <button type="button" data-stake="5000">₹5K</button>
+      </div>
+      <div class="session-meter" id="sessionMeter" hidden>
+        <div><span>Current multiplier</span><strong id="sessionMultiplier">1.00×</strong></div>
+        <div><span>Potential return</span><strong id="sessionReturn">₹0.00</strong></div>
+      </div>
+      <button class="instant-action" id="primaryAction" type="button"><i class="fa-solid fa-bolt"></i><span><small id="actionEyebrow">NEW ROUND</small><b id="actionLabel">PLAY FOR ₹100.00</b></span></button>
+      <button class="cashout-action" id="cashoutAction" type="button" hidden><i class="fa-solid fa-coins"></i> <span>Cash out</span></button>
+      <p class="instant-note" id="gameNote"><i class="fa-solid fa-lock"></i> Sign in to play. The game remains visible before login.</p>
+    </aside>
+  </div>
+
+  <section class="game-history glass">
+    <div class="history-head"><div><span>YOUR ACTIVITY</span><h2>Recent rounds</h2></div><span id="historyStatus">Sign in required</span></div>
+    <div class="instant-history-list" id="instantHistory"><div class="instant-empty"><i class="fa-solid fa-ticket"></i><span>Your rounds will appear here.</span></div></div>
+  </section>
+
+  <div class="games-disclaimer"><strong>DEMO · NO REAL MONEY</strong><span>Entertainment simulation for adults 18+. Credits have no cash value.</span></div>
+</main>
+
+<div class="modal-overlay" id="historyModal"><div class="modal glass"><div class="modal-header"><h2><i class="fa-solid fa-user-tie"></i> My Profile</h2><button class="modal-close" id="closeModal"><i class="fa-solid fa-xmark"></i></button></div><div class="stat-grid"><div class="stat-box"><div class="val" id="modalBalance">₹0.00</div><div class="lbl">Current Balance</div></div></div><div class="achv-grid" id="achvGrid"></div><table class="history"><thead><tr><th>Date</th><th>Event</th><th>Stake</th><th>Result</th><th>P/L</th></tr></thead><tbody id="historyTableBody"></tbody></table></div></div>
+<div class="toast" id="toast"><i class="fa-solid fa-check-circle"></i> <span id="toastMsg">Ready</span></div>
+<div class="achieve-toast" id="achieveToast"><i class="fa-solid fa-trophy trophy"></i><div><div class="a-title">Achievement Unlocked</div><div class="a-name" id="achieveName"></div><div class="a-desc" id="achieveDesc"></div></div></div>
+<div class="winfeed-stack" id="winfeedStack"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
+<script src="supabase-app.js"></script>
+<script src="platform-features.js"></script>
+<script src="instant-games.js"></script>
+</body>
+</html>

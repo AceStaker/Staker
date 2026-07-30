@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Explore Ace Staker's collection of polished demo-credit instant games.">
+<title>Ace Staker | Games</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="feature-styles.css">
+<link rel="stylesheet" href="games.css">
+</head>
+<body class="games-page">
+<canvas id="confettiCanvas"></canvas>
+
+<header class="header">
+  <a href="home.html" class="logo" style="text-decoration:none;">
+    <i class="fa-solid fa-spade"></i><span>Ace Staker</span>
+  </a>
+  <nav>
+    <ul class="nav-links">
+      <li><a href="casino.html" data-nav="casino">Casino</a></li>
+      <li><a href="games.html" class="active" data-nav="games">Games</a></li>
+      <li><a href="sports.html" data-nav="sports">Sports</a></li>
+      <li><a href="live.html" data-nav="live">Live</a></li>
+      <li><a href="esports.html" data-nav="esports">Esports</a></li>
+      <li><a href="promotions.html" data-nav="promotions">Promotions</a></li>
+      <li><a href="help.html" data-nav="help">Help</a></li>
+    </ul>
+  </nav>
+  <div class="header-right">
+    <div class="balance-pill" id="balancePill">
+      <i class="fa-solid fa-coins"></i><span class="balance-text" id="balanceText">₹0.00</span>
+    </div>
+    <div class="avatar-wrap">
+      <div class="avatar" id="avatarBtn">GU<span class="avatar-level" id="avatarLevel">1</span></div>
+      <div class="dropdown glass" id="userDropdown">
+        <a href="#" id="profileBtn"><i class="fa-solid fa-user"></i> My Profile</a>
+        <a href="#" id="historyBtn"><i class="fa-solid fa-clock-rotate-left"></i> Betting History</a>
+        <a href="#"><i class="fa-solid fa-wallet"></i> Deposit / Withdraw</a>
+        <hr>
+        <a href="#"><i class="fa-solid fa-right-to-bracket"></i> Login</a>
+        <a href="#"><i class="fa-solid fa-user-plus"></i> Register</a>
+        <hr>
+        <button><i class="fa-solid fa-arrow-right-from-bracket"></i> Log Out</button>
+      </div>
+    </div>
+    <button class="mobile-nav-toggle" aria-label="Open navigation"><i class="fa-solid fa-bars"></i></button>
+  </div>
+</header>
+
+<main class="games-main">
+  <section class="games-hero">
+    <div class="games-hero-copy">
+      <span class="games-eyebrow"><i class="fa-solid fa-wand-magic-sparkles"></i> ACE ORIGINALS</span>
+      <h1>Seven worlds.<br><span>One balance.</span></h1>
+      <p>Fast, vivid demo games with server-decided outcomes, instant wallet updates, and controls built for every screen.</p>
+      <div class="games-hero-meta">
+        <span><i class="fa-solid fa-shield-halved"></i> Server validated</span>
+        <span><i class="fa-solid fa-mobile-screen-button"></i> Mobile first</span>
+        <span><i class="fa-solid fa-coins"></i> Demo credits</span>
+      </div>
+    </div>
+    <div class="games-hero-orbit" aria-hidden="true">
+      <span class="orbit-core"><i class="fa-solid fa-spade"></i></span>
+      <span class="orbit-item orbit-one"><i class="fa-solid fa-plane-up"></i></span>
+      <span class="orbit-item orbit-two"><i class="fa-solid fa-gem"></i></span>
+      <span class="orbit-item orbit-three"><i class="fa-solid fa-dice"></i></span>
+      <span class="orbit-ring ring-one"></span>
+      <span class="orbit-ring ring-two"></span>
+    </div>
+  </section>
+
+  <section class="games-section">
+    <div class="games-section-head">
+      <div>
+        <span>CHOOSE YOUR GAME</span>
+        <h2>Instant-play collection</h2>
+      </div>
+      <p>Sign in to play. Every game remains visible before login.</p>
+    </div>
+
+    <div class="games-catalogue">
+      <a class="game-card aviator-card featured" href="aviator.html">
+        <div class="game-card-art aviator-art">
+          <span class="art-moon"></span>
+          <span class="art-trail"></span>
+          <img src="aviator-plane.png" alt="" width="1890" height="823">
+        </div>
+        <div class="game-card-content">
+          <span class="game-status live"><i class="fa-solid fa-circle"></i> LIVE</span>
+          <h3>Aviator</h3>
+          <p>Ride the rising multiplier and cash out before the aircraft disappears.</p>
+          <span class="game-enter">Enter cockpit <i class="fa-solid fa-arrow-right"></i></span>
+        </div>
+      </a>
+
+      <a class="game-card crossing-card" href="play.html?game=crossing">
+        <div class="game-card-art crossing-art">
+          <span class="road-line line-one"></span><span class="road-line line-two"></span>
+          <span class="mini-car car-one"><i class="fa-solid fa-car-side"></i></span>
+          <span class="mini-car car-two"><i class="fa-solid fa-truck-pickup"></i></span>
+          <span class="mini-chicken"><i class="fa-solid fa-feather-pointed"></i></span>
+        </div>
+        <div class="game-card-content">
+          <span class="game-status new"><i class="fa-solid fa-sparkles"></i> NEW</span>
+          <h3>Lucky Crossing</h3>
+          <p>Hop through live traffic. Every safe lane raises your cash-out multiplier.</p>
+          <span class="game-enter">Cross the road <i class="fa-solid fa-arrow-right"></i></span>
+        </div>
+      </a>
+
+      <a class="game-card mines-card" href="play.html?game=mines">
+        <div class="game-card-art mines-art">
+          <span class="mine-tile gem"><i class="fa-solid fa-gem"></i></span>
+          <span class="mine-tile bomb"><i class="fa-solid fa-bomb"></i></span>
+          <span class="mine-tile gem small"><i class="fa-solid fa-gem"></i></span>
+        </div>
+        <div class="game-card-content">
+          <span class="game-status new"><i class="fa-solid fa-sparkles"></i> NEW</span>
+          <h3>Mines</h3>
+          <p>Reveal hidden gems, avoid the mines, and decide when you have enough.</p>
+          <span class="game-enter">Open the vault <i class="fa-solid fa-arrow-right"></i></span>
+        </div>
+      </a>
+
+      <a class="game-card plinko-card" href="play.html?game=plinko">
+        <div class="game-card-art plinko-art">
+          <span class="plinko-ball"></span>
+          <span class="peg peg-a"></span><span class="peg peg-b"></span><span class="peg peg-c"></span>
+          <span class="peg peg-d"></span><span class="peg peg-e"></span><span class="peg peg-f"></span>
+        </div>
+        <div class="game-card-content">
+          <span class="game-status new"><i class="fa-solid fa-sparkles"></i> NEW</span>
+          <h3>Plinko</h3>
+          <p>Drop the energy ball through a neon field and watch where it lands.</p>
+          <span class="game-enter">Drop a ball <i class="fa-solid fa-arrow-right"></i></span>
+        </div>
+      </a>
+
+      <a class="game-card tower-card" href="play.html?game=tower">
+        <div class="game-card-art tower-art">
+          <span class="tower-level level-one"></span><span class="tower-level level-two"></span>
+          <span class="tower-level level-three"></span><span class="tower-level level-four"></span>
+          <span class="tower-beacon"><i class="fa-solid fa-crown"></i></span>
+        </div>
+        <div class="game-card-content">
+          <span class="game-status new"><i class="fa-solid fa-sparkles"></i> NEW</span>
+          <h3>Tower</h3>
+          <p>Choose the safe platform on every floor and climb toward the crown.</p>
+          <span class="game-enter">Begin ascent <i class="fa-solid fa-arrow-right"></i></span>
+        </div>
+      </a>
+
+      <a class="game-card dice-card" href="play.html?game=dice">
+        <div class="game-card-art dice-art">
+          <span class="dice-cube cube-one"><i class="fa-solid fa-dice-five"></i></span>
+          <span class="dice-cube cube-two"><i class="fa-solid fa-dice-three"></i></span>
+          <span class="dice-glow"></span>
+        </div>
+        <div class="game-card-content">
+          <span class="game-status new"><i class="fa-solid fa-sparkles"></i> NEW</span>
+          <h3>Dice</h3>
+          <p>Set the line, choose over or under, and watch the precision roll resolve.</p>
+          <span class="game-enter">Roll the dice <i class="fa-solid fa-arrow-right"></i></span>
+        </div>
+      </a>
+
+      <a class="game-card limbo-card" href="play.html?game=limbo">
+        <div class="game-card-art limbo-art">
+          <span class="limbo-ring ring-a"></span><span class="limbo-ring ring-b"></span>
+          <strong>9.87<span>×</span></strong>
+        </div>
+        <div class="game-card-content">
+          <span class="game-status new"><i class="fa-solid fa-sparkles"></i> NEW</span>
+          <h3>Limbo</h3>
+          <p>Choose your target multiplier and see whether the pulse can reach it.</p>
+          <span class="game-enter">Set a target <i class="fa-solid fa-arrow-right"></i></span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <div class="games-disclaimer">
+    <strong>DEMO · NO REAL MONEY</strong>
+    <span>Entertainment simulation for adults 18+. Outcomes use credits with no cash value.</span>
+  </div>
+</main>
+
+<div class="modal-overlay" id="historyModal">
+  <div class="modal glass">
+    <div class="modal-header"><h2><i class="fa-solid fa-user-tie"></i> My Profile</h2><button class="modal-close" id="closeModal"><i class="fa-solid fa-xmark"></i></button></div>
+    <div class="stat-grid"><div class="stat-box"><div class="val" id="modalBalance">₹0.00</div><div class="lbl">Current Balance</div></div></div>
+    <div class="achv-grid" id="achvGrid"></div>
+    <table class="history"><thead><tr><th>Date</th><th>Event</th><th>Stake</th><th>Result</th><th>P/L</th></tr></thead><tbody id="historyTableBody"></tbody></table>
+  </div>
+</div>
+<div class="toast" id="toast"><i class="fa-solid fa-check-circle"></i> <span id="toastMsg">Ready</span></div>
+<div class="achieve-toast" id="achieveToast"><i class="fa-solid fa-trophy trophy"></i><div><div class="a-title">Achievement Unlocked</div><div class="a-name" id="achieveName"></div><div class="a-desc" id="achieveDesc"></div></div></div>
+<div class="winfeed-stack" id="winfeedStack"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.95.0/dist/umd/supabase.min.js"></script>
+<script src="supabase-config.js"></script>
+<script src="script.js"></script>
+<script src="supabase-app.js"></script>
+<script src="platform-features.js"></script>
+</body>
+</html>
