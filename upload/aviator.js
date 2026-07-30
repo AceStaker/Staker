@@ -30,9 +30,7 @@
       'actionLabel', 'consoleNote', 'aviatorStake', 'stakeChips',
       'autoCashToggle', 'autoCashValue', 'potentialMultiplier',
       'potentialReturn', 'activeTicket', 'ticketStake', 'ticketAuto',
-      'seedHash', 'seedReveal', 'seedRevealRow', 'copySeedHash',
-      'verifyLastRound', 'verificationResult', 'myFlights',
-      'flightLogStatus', 'soundToggle'
+      'myFlights', 'flightLogStatus', 'soundToggle'
     ].forEach(id => { els[id] = document.getElementById(id); });
   }
 
@@ -109,15 +107,6 @@
     els.roundCode.textContent = String(round.id).slice(0, 8).toUpperCase();
     els.playerCount.textContent = Number(round.players || 0).toLocaleString('en-IN');
     els.roundPool.textContent = money(round.total_stake || 0).replace('.00', '');
-    els.seedHash.textContent = round.seed_hash || 'Waiting for commitment…';
-    els.seedHash.title = round.seed_hash || '';
-
-    els.seedRevealRow.hidden = !round.seed_reveal;
-    if (round.seed_reveal) {
-      els.seedReveal.textContent = round.seed_reveal;
-      els.seedReveal.title = round.seed_reveal;
-    }
-
     if (Number.isFinite(Number(snapshot.balance))) {
       window.AceUI?.setBalance(Number(snapshot.balance));
       window.AceUI?.updateBalanceDisplay();
@@ -200,19 +189,19 @@
     const activeBet = bet?.status === 'pending';
     const stake = validStake();
 
-    els.aviatorStake.disabled = Boolean(bet);
-    els.autoCashToggle.disabled = Boolean(bet);
-    els.autoCashValue.disabled = Boolean(bet) || !els.autoCashToggle.checked;
-    els.stakeChips.querySelectorAll('button').forEach(button => { button.disabled = Boolean(bet); });
+    els.aviatorStake.disabled = !signedIn || Boolean(bet);
+    els.autoCashToggle.disabled = !signedIn || Boolean(bet);
+    els.autoCashValue.disabled = !signedIn || Boolean(bet) || !els.autoCashToggle.checked;
+    els.stakeChips.querySelectorAll('button').forEach(button => { button.disabled = !signedIn || Boolean(bet); });
 
     els.flightAction.disabled = actionPending;
     els.flightAction.className = 'flight-action';
 
     if (!signedIn) {
       els.flightAction.classList.add('board');
-      els.actionEyebrow.textContent = 'DEMO ACCOUNT';
-      els.actionLabel.textContent = 'SIGN IN TO BOARD';
-      els.consoleNote.innerHTML = '<i class="fa-solid fa-circle-info"></i> Sign in to place a demo-credit wager. No real money or prizes.';
+      els.actionEyebrow.textContent = 'ACCOUNT REQUIRED';
+      els.actionLabel.textContent = 'SIGN IN TO PLAY';
+      els.consoleNote.innerHTML = '<i class="fa-solid fa-lock"></i> The live flight remains visible. Sign in to unlock betting controls.';
       return;
     }
 
@@ -395,8 +384,8 @@
   async function handleAction() {
     if (actionPending) return;
     if (!user()) {
-      document.getElementById('avatarBtn')?.click();
-      notify('Sign in to board the next demo flight.', true);
+      window.openAceAuth?.(false);
+      notify('Sign in to unlock Aviator betting.', true);
       return;
     }
 
@@ -435,50 +424,8 @@
     }
   }
 
-  async function copyCommitment() {
-    const value = snapshot?.round?.seed_hash;
-    if (!value) return;
-    try {
-      await navigator.clipboard.writeText(value);
-      notify('Round commitment copied.');
-    } catch (_error) {
-      notify('Could not copy the commitment.', true);
-    }
-  }
-
-  async function verifyLastRound() {
-    const round = snapshot?.history?.[0];
-    if (!round?.seed_reveal) {
-      notify('A completed round is required for verification.', true);
-      return;
-    }
-    try {
-      const encoded = new TextEncoder().encode(round.seed_reveal);
-      const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', encoded));
-      let value = 0n;
-      for (let index = 0; index < 7; index += 1) {
-        value = (value * 256n) + BigInt(digest[index]);
-      }
-      value /= 16n;
-      const unit = Number(value) / 4503599627370496;
-      const calculated = Math.floor(Math.min(1000, Math.max(1, .97 / Math.max(.0000000001, 1 - unit))) * 100) / 100;
-      const recorded = Number(round.crash_multiplier);
-      const verified = Math.abs(calculated - recorded) < .001;
-      els.verificationResult.hidden = false;
-      els.verificationResult.textContent = verified
-        ? `Verified — the revealed seed reproduces ${recorded.toFixed(2)}× exactly.`
-        : 'Verification failed. The recorded multiplier does not match the revealed seed.';
-      if (!verified) els.verificationResult.style.color = '#ff7088';
-      notify(verified ? 'Last round verified.' : 'Round verification failed.', !verified);
-    } catch (error) {
-      notify(`Could not verify the round: ${error.message}`, true);
-    }
-  }
-
   function bindEvents() {
     els.flightAction.addEventListener('click', handleAction);
-    els.copySeedHash.addEventListener('click', copyCommitment);
-    els.verifyLastRound.addEventListener('click', verifyLastRound);
     els.aviatorStake.addEventListener('input', updatePotential);
     els.autoCashValue.addEventListener('input', updatePotential);
     els.autoCashToggle.addEventListener('change', () => {

@@ -196,29 +196,6 @@
   </div>
 
   <section class="aviator-lower-grid">
-    <div class="fairness-card glass">
-      <div class="panel-heading">
-        <div>
-          <span>VERIFIABLE ROUND</span>
-          <h3><i class="fa-solid fa-fingerprint"></i> Provably fair</h3>
-        </div>
-        <div class="fairness-actions">
-          <button type="button" id="copySeedHash" aria-label="Copy seed commitment"><i class="fa-regular fa-copy"></i></button>
-          <button type="button" id="verifyLastRound"><i class="fa-solid fa-check-double"></i> Verify last round</button>
-        </div>
-      </div>
-      <p>The server commits to a hidden seed before takeoff. It reveals that seed after the crash so the round cannot be changed mid-flight.</p>
-      <div class="seed-line">
-        <span>SHA-256 commitment</span>
-        <code id="seedHash">Waiting for round…</code>
-      </div>
-      <div class="seed-line reveal" id="seedRevealRow" hidden>
-        <span>Revealed server seed</span>
-        <code id="seedReveal">—</code>
-      </div>
-      <p class="verification-result" id="verificationResult" hidden></p>
-    </div>
-
     <div class="my-flights-card glass">
       <div class="panel-heading">
         <div>

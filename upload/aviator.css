@@ -419,7 +419,7 @@
   z-index:4;
   left:var(--plane-x);
   top:var(--plane-y);
-  width:clamp(225px,30vw,410px);
+  width:clamp(175px,22vw,300px);
   aspect-ratio:1890/823;
   transform:translate(-50%,-50%) rotate(var(--plane-bank)) scale(var(--plane-scale));
   transform-origin:center;
@@ -731,7 +731,7 @@
 
 .aviator-lower-grid{
   display:grid;
-  grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+  grid-template-columns:1fr;
   gap:16px;
   margin-top:16px;
 }
@@ -943,7 +943,7 @@
   .history-chip{ min-width:58px; padding:7px 8px; }
   .aviator-grid{ gap:10px; }
   .flight-stage{ min-height:430px; border-radius:14px; }
-  .plane-wrap{ --plane-x:26%; width:clamp(190px,57vw,280px); }
+  .plane-wrap{ --plane-x:26%; width:clamp(150px,44vw,220px); }
   .stage-topline{ top:14px; left:14px; right:14px; }
   .multiplier{ font-size:5rem; }
   .flight-message{ margin-top:14px; font-size:.68rem; }
